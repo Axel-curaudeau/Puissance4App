@@ -138,6 +138,7 @@
     <ClCompile Include="GameUI.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MainMenu.cpp" />
+    <ClCompile Include="Robot.cpp" />
     <ClCompile Include="uiController.cpp" />
     <ClCompile Include="StateMachine.cpp" />
   </ItemGroup>
@@ -145,6 +146,7 @@
     <ClInclude Include="Button.hpp" />
     <ClInclude Include="GameUI.hpp" />
     <ClInclude Include="MainMenu.hpp" />
+    <ClInclude Include="Robot.hpp" />
     <ClInclude Include="uiController.hpp" />
     <ClInclude Include="StateMachine.hpp" />
   </ItemGroup>

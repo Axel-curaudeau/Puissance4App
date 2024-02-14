@@ -19,6 +19,12 @@
     <Filter Include="Fichiers sources\UserInterface">
       <UniqueIdentifier>{dd3c4e7b-7af5-42f4-a2a0-f510c7c4ea90}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Fichiers sources\RobotControl">
+      <UniqueIdentifier>{6ba33117-3712-40d0-bb69-046f9bfa9833}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers d%27en-tête\RobotControl">
+      <UniqueIdentifier>{6883b9fd-fc4d-4c0a-b9fb-d67e3912ec66}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -39,6 +45,9 @@
     <ClCompile Include="Button.cpp">
       <Filter>Fichiers sources\UserInterface</Filter>
     </ClCompile>
+    <ClCompile Include="Robot.cpp">
+      <Filter>Fichiers sources\RobotControl</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="uiController.hpp">
@@ -55,6 +64,9 @@
     </ClInclude>
     <ClInclude Include="Button.hpp">
       <Filter>Fichiers d%27en-tête\UserInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="Robot.hpp">
+      <Filter>Fichiers d%27en-tête\RobotControl</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
