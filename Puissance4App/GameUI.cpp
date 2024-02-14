@@ -53,7 +53,7 @@ void GameUI::draw(sf::RenderWindow& window)
 
 void GameUI::getWebcamImage()
 {
-	cv::VideoCapture cap(1);
+	cv::VideoCapture cap(0);
 	if (!cap.isOpened())
 		return;
 
