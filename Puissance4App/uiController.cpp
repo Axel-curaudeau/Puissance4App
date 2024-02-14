@@ -1,0 +1,55 @@
+#include "uiController.hpp"
+
+
+uiController::uiController(sf::Vector2u windowSize)
+{	
+	window.create(sf::VideoMode(windowSize.x, windowSize.y), "Puissance 4 avec le robot !");
+	window.setFramerateLimit(60);
+
+	font = new sf::Font();
+	if (!font->loadFromFile(fontPath)) {
+		std::cerr << "Add the font file here :" << fontPath << std::endl;
+	}
+	mainMenu = MainMenu(font);
+	game = GameUI(font);
+}
+
+StateMachine::State uiController::tick(StateMachine::State actualState)
+{
+	sf::Event event;
+	while (window.pollEvent(event)) {
+
+		if (event.type == sf::Event::Closed)
+			window.close();
+		if (event.type == sf::Event::Resized) {
+			sf::Vector2f windowSize = window.getView().getSize();
+			window.setView(sf::View(sf::FloatRect(0, 0, event.size.width, event.size.height)));
+		}
+		if (actualState == StateMachine::State::MainMenu) {
+			StateMachine::State newState = mainMenu.handleEvent(event);
+			if (newState != StateMachine::State::MainMenu) {
+				return newState;
+			}
+		}
+		if (actualState == StateMachine::State::Game) {
+			StateMachine::State newState = game.handleEvent(event);
+			if (newState != StateMachine::State::Game) {
+				return newState;
+			}
+		}
+	}
+
+	window.clear();
+
+	if (actualState == StateMachine::State::MainMenu) {
+		mainMenu.updateButton(window.getSize());
+		mainMenu.draw(window);
+	}
+	else if (actualState == StateMachine::State::Game) {
+		game.draw(window);
+	}
+
+	window.display();
+
+	return actualState;
+}
