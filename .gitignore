@@ -28,7 +28,8 @@ x64/
 [Aa][Rr][Mm]/
 [Aa][Rr][Mm]64/
 bld/
-[Bb]in/
+#[Bb]in/
+#Deleted bin for ignore because of opencv build folder
 [Oo]bj/
 [Ll]og/
 [Ll]ogs/
