@@ -11,6 +11,7 @@ public:
 	StateMachine::State tick(StateMachine::State actualState);
 	sf::RenderWindow& getWindow() { return window; }
 	sf::Font* font;
+	void stop(StateMachine::State actualState);
 
 private:
 	sf::RenderWindow window;

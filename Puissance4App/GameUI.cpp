@@ -9,8 +9,10 @@ GameUI::~GameUI()
 {
 	if (webcamThread != nullptr)
 	{
+		webcamThreadRunning = false;
 		webcamThread->join();
 		delete webcamThread;
+		webcamThread = nullptr;
 	}
 }
 
@@ -57,7 +59,7 @@ void GameUI::getWebcamImage()
 	if (!cap.isOpened())
 		return;
 
-	while (true)
+	while (webcamThreadRunning)
 	{
 		cv::Mat frame;
 		cap >> frame;

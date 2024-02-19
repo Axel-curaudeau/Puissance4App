@@ -44,3 +44,37 @@ void Robot::Home()
 	}
 	std::cout << "Dobot position successfully reset" << std::endl;
 }
+
+void Robot::Play(int column)
+{
+	if (remainingPieces == 0) {
+		std::cerr << "No more pieces" << std::endl;
+		return;
+	}
+
+	if (column < 0 || column > 6) {
+		std::cerr << "Invalid column" << std::endl;
+		return;
+	}
+
+	std::cout << "Playing in column " << column << std::endl;
+	GoTo(columnCoordinates[column].x, columnCoordinates[column].y);
+	openGripper();
+	CloseGripper();
+	remainingPieces--;
+}
+
+void Robot::GoTo(int x, int y)
+{
+	//TODO: implement
+}
+
+void Robot::openGripper()
+{
+	//TODO: implement
+}
+
+void Robot::CloseGripper()
+{
+	//TODO: implement
+}

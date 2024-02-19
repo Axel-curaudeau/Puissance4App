@@ -53,3 +53,13 @@ StateMachine::State uiController::tick(StateMachine::State actualState)
 
 	return actualState;
 }
+
+void uiController::stop(StateMachine::State actualState)
+{
+	if (actualState == StateMachine::State::MainMenu) {
+		mainMenu.~MainMenu();
+	}
+	else if (actualState == StateMachine::State::Game) {
+		game.~GameUI();
+	}
+}

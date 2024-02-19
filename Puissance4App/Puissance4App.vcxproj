@@ -134,18 +134,22 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Board.cpp" />
     <ClCompile Include="Button.cpp" />
     <ClCompile Include="GameUI.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MainMenu.cpp" />
+    <ClCompile Include="Negamax.cpp" />
     <ClCompile Include="Robot.cpp" />
     <ClCompile Include="uiController.cpp" />
     <ClCompile Include="StateMachine.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Board.hpp" />
     <ClInclude Include="Button.hpp" />
     <ClInclude Include="GameUI.hpp" />
     <ClInclude Include="MainMenu.hpp" />
+    <ClInclude Include="Negamax.hpp" />
     <ClInclude Include="Robot.hpp" />
     <ClInclude Include="uiController.hpp" />
     <ClInclude Include="StateMachine.hpp" />

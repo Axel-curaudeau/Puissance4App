@@ -6,6 +6,8 @@
 #include "Button.hpp"
 #include "StateMachine.hpp"
 
+static bool webcamThreadRunning = true;
+
 class GameUI
 {
 public:

@@ -7,10 +7,14 @@ class Robot
 {
 public:
 	Robot();
-	void GoTo(int x, int y);
 	void Home();
-	void Close();
+	void Play(int column);
 private:
 	int dobotId;
+	int remainingPieces = 8;
+	Pose columnCoordinates[7];
+	void GoTo(int x, int y);
+	void openGripper();
+	void CloseGripper();
 };
 
