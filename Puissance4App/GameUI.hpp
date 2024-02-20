@@ -6,7 +6,7 @@
 #include "Button.hpp"
 #include "StateMachine.hpp"
 
-static bool webcamThreadRunning = true;
+static std::atomic<bool> webcamThreadRunning = true;
 
 class GameUI
 {
@@ -27,6 +27,5 @@ private:
 	sf::Image webcamImage;
 	sf::Texture webcamTexture;
 	sf::Sprite webcamSprite;
-
 };
 

@@ -8,7 +8,9 @@ using namespace std;
 int main()
 {
 	Robot robot;
+	robot.connect();
 	robot.Home();
+	robot.Play(0);
 
 	sf::Vector2u windowSize(1280, 720);
 	uiController uiController(windowSize);
