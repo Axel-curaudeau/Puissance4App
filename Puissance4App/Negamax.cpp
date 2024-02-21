@@ -4,6 +4,12 @@ int Negamax::GetBestMove(Board board)
 {
 	std::thread columnThreads[7];
 	int* results = new int[7];
+
+	for (int i = 0; i < 7; i++)
+	{
+		results[i] = -1000;
+	}
+
 	for (int i = 0; i < 7; i++)
 	{
 		if (board.isValidMove(i))
@@ -24,10 +30,18 @@ int Negamax::GetBestMove(Board board)
 			columnThreads[i].join();
 		}
 	}
+	int bestMove = 0;
+	int bestValue = -1000;
 	for (int i = 0; i < 7; i++)
 	{
+		if (results[i] > bestValue)
+		{
+			bestValue = results[i];
+			bestMove = i;
+		}
 		std::cout << results[i] << std::endl;
 	}
+	return bestMove;
 }
 
 int Negamax::Evaluate(Board board)
