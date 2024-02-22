@@ -1,24 +1,23 @@
 #include "Robot.hpp"
-#include <iostream>
 
 Robot::Robot()
 {
-	columnCoordinates[0] = { 252, -111, 88, 0 };
-	columnCoordinates[1] = { 253, -79, 88, 0 };
-	columnCoordinates[2] = { 254, -38, 88, 0 };
-	columnCoordinates[3] = { 254, -6, 88, 0 };
-	columnCoordinates[4] = { 255, 32, 88, 0 };
-	columnCoordinates[5] = { 255, 66, 88, 0 };
-	columnCoordinates[6] = { 256, 107, 88, 0 };
+	columnCoordinates[0] = { 254, -111, 88, 0 };
+	columnCoordinates[1] = { 255, -77, 88, 0 };
+	columnCoordinates[2] = { 256, -38, 88, 0 };
+	columnCoordinates[3] = { 256, -6, 88, 0 };
+	columnCoordinates[4] = { 256, 32, 88, 0 };
+	columnCoordinates[5] = { 257, 66, 88, 0 };
+	columnCoordinates[6] = { 257, 107, 88, 0 };
 
-	pieceCoordinates[0] = { -58, -220, -124, -90 };
-	pieceCoordinates[1] = { -13, -220, 200, -90 };
-	pieceCoordinates[2] = { 28, -220, 200, -90 };
-	pieceCoordinates[3] = { 75, -220, 200, -90 };
-	pieceCoordinates[4] = { -50, 226, 200, -90 };
-	pieceCoordinates[5] = { -11, 226, 200, -90 };
-	pieceCoordinates[6] = { 33, 226, 200, -90 };
-	pieceCoordinates[7] = { 78, 226, 200, -90 };
+	pieceCoordinates[0] = { -58, -220, -126, -90 };
+	pieceCoordinates[1] = { -13, -220, -126, -90 };
+	pieceCoordinates[2] = { 28, -220, -126, -90 };
+	pieceCoordinates[3] = { 75, -220, -126, -90 };
+	pieceCoordinates[4] = { -50, 223, -126, 90 };
+	pieceCoordinates[5] = { -11, 223, -126, 90 };
+	pieceCoordinates[6] = { 33, 223, -126, 90 };
+	pieceCoordinates[7] = { 78, 222, -126, 90 };
 }
 
 Robot::~Robot()
@@ -54,6 +53,20 @@ void Robot::connect()
 	}
 
 	std::cout << "Connected to dobot" << std::endl;
+
+	int resultClearAllAlarms = ClearAllAlarmsState(dobotId);
+	if (resultClearAllAlarms != DobotCommunicate_NoError) {
+		std::cerr << "Failed to clear all alarms" << std::endl;
+		return;
+	}
+	
+	JOGCoordinateParams* jogCoordinateParams = new JOGCoordinateParams;
+	int result = GetJOGCoordinateParams(dobotId, jogCoordinateParams);
+	if (result != DobotCommunicate_NoError) {
+		std::cerr << "Failed to get jog coordinate params" << std::endl;
+		return;
+	}
+	std::cout << "JOGCoordinateParams: velocityX = " << jogCoordinateParams->velocity[0] << ", velocityY = " << jogCoordinateParams->velocity[1] << ", velocityZ = " << jogCoordinateParams->velocity[2] << ", velocityR = " << jogCoordinateParams->velocity[3] << std::endl;
 }
 
 void Robot::Home()
@@ -67,6 +80,8 @@ void Robot::Home()
 		return;
 	}
 	std::cout << "Dobot position successfully reset" << std::endl;
+
+	goTo(pieceCoordinates[0], 90);
 }
 
 void Robot::Play(int column)
@@ -83,15 +98,23 @@ void Robot::Play(int column)
 
 	std::cout << "Playing in column " << column << std::endl;
 	grabPiece();
+	goTo(columnCoordinates[column], 90);
 	goTo(columnCoordinates[column]);
 	openGripper();
-	turnOffGripper(); 
+	wait(0.5);
+	turnOffGripper();
+	if (remainingPieces > 0) {
+		goTo(pieceCoordinates[(8 - remainingPieces)], 90);
+	}
+	else {
+		goTo(pieceCoordinates[0], 90);
+	}
 }
 
 void Robot::goTo(Pose position)
 {
 	PTPCmd ptpCmd = { 0 };
-	ptpCmd.ptpMode = PTPMOVJXYZMode;
+	ptpCmd.ptpMode = PTPJUMPXYZMode;
 	ptpCmd.x = position.x;
 	ptpCmd.y = position.y;
 	ptpCmd.z = position.z;
@@ -101,13 +124,12 @@ void Robot::goTo(Pose position)
 	int resultDobotPTP = SetPTPCmd(dobotId, &ptpCmd, true, &queuedCmdIndex);
 	if (resultDobotPTP != DobotCommunicate_NoError) {
 		std::cerr << "Failed to move dobot to position" << std::endl;
-		return;
 	}
 }
 
-void Robot::goTo(Pose position, float zOffset)
+void Robot::goTo(Pose position, float z)
 {
-	Pose newPose = {position.x, position.y, position.z + zOffset, position.r};
+	Pose newPose = {position.x, position.y, z, position.r};
 	goTo(newPose);
 }
 
@@ -124,11 +146,11 @@ void Robot::closeGripper()
 
 void Robot::grabPiece()
 {
-	goTo(pieceCoordinates[8 - remainingPieces], 200);
 	openGripper();
 	goTo(pieceCoordinates[8 - remainingPieces]);
 	closeGripper();
-	goTo(pieceCoordinates[8 - remainingPieces], 200);
+	wait(0.5);
+	goTo(pieceCoordinates[8 - remainingPieces], 90);
 	remainingPieces--;
 }
 
@@ -138,7 +160,6 @@ void Robot::gripper(bool close, bool on)
 	int resultDobotGripper = SetEndEffectorGripper(dobotId, on, close, true, &queuedCmdIndex);
 	if (resultDobotGripper != DobotCommunicate_NoError) {
 		std::cerr << "Failed to close gripper" << std::endl;
-		return;
 	}
 }
 
@@ -146,4 +167,16 @@ void Robot::gripper(bool close, bool on)
 void Robot::turnOffGripper()
 {
 	gripper(false, false);
+}
+
+void Robot::wait(float seconds)
+{
+	WAITCmd waitCmd = { 0 };
+	waitCmd.timeout = seconds * 1000;
+
+	uint64_t queuedCmdIndex;
+	int resultDobotWait = SetWAITCmd(dobotId, &waitCmd, true, &queuedCmdIndex);
+	if (resultDobotWait != DobotCommunicate_NoError) {
+		std::cerr << "Failed to wait" << std::endl;
+	}
 }

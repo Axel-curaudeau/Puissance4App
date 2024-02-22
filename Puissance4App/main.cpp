@@ -8,12 +8,13 @@ using namespace std;
 
 int main()
 {
-	/*Robot robot;
+	Robot robot;
 	robot.connect();
 	robot.Home();
-	robot.Play(0);*/
+	robot.Play(3);
 
 	//Test Board
+	/*
 	try {
 		Board board;
 		board.Play(0);
@@ -23,12 +24,11 @@ int main()
 		cout << "Best move: " << bestMove << endl;
 		board.Play(bestMove);
 		board.printBoard();
-
-
 	}
 	catch (exception e) {
 		cout << e.what() << endl;
 	}
+	*/
 	
 
 
