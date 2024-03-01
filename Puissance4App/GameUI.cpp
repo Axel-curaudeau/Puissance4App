@@ -14,6 +14,9 @@ GameUI::~GameUI()
 		delete webcamThread;
 		webcamThread = nullptr;
 	}
+	delete webcamImage;
+	delete webcamTexture;
+	delete webcamSprite;
 }
 
 GameUI::GameUI(sf::Font* font)
@@ -28,6 +31,10 @@ GameUI::GameUI(sf::Font* font)
 	backButton.setButtonTextSize(80);
 
 	gameGrid.setFillColor(sf::Color::Blue);
+
+	webcamImage = new sf::Image();
+	webcamTexture = new sf::Texture();
+	webcamSprite = new sf::Sprite();
 }
 
 void GameUI::draw(sf::RenderWindow& window)
@@ -37,47 +44,39 @@ void GameUI::draw(sf::RenderWindow& window)
 	gameGrid.setSize(sf::Vector2f(windowSize.y * 0.5 * 7 / 6, windowSize.y * 0.5));
 	gameGrid.setPosition(sf::Vector2f(windowSize.x / 2 - gameGrid.getSize().x / 2, windowSize.y - gameGrid.getSize().y));
 	
-	webcamSprite.setPosition(sf::Vector2f(windowSize.x / 2 - webcamSprite.getGlobalBounds().width / 2 - 10, 10));
+	webcamSprite->setPosition(sf::Vector2f(windowSize.x / 2 - webcamSprite->getGlobalBounds().width / 2 - 10, 10));
 	
 	window.draw(gameGrid);
 	backButton.draw(window);
 	
-	if (webcamThread == nullptr)
-	{
-		webcamThread = new std::thread(&GameUI::getWebcamImage, this);
-	}
-	else 
-	{
-		window.draw(webcamSprite);
-	}
-	
+	window.draw(*webcamSprite);
 }
 
-void GameUI::getWebcamImage()
+void GameUI::getImageFromCamera(Camera* camera)
 {
-	cv::VideoCapture cap(0);
-	if (!cap.isOpened())
-		return;
-
-	while (webcamThreadRunning)
+	if (camera->getFrame().empty())
 	{
-		cv::Mat frame;
-		cap >> frame;
-		cv::cvtColor(frame, frame, cv::COLOR_BGR2RGB);
-		
-		sf::Uint8* pixels = new sf::Uint8[frame.cols * frame.rows * 4];
-		for (int i = 0; i < frame.cols * frame.rows; i++)
-		{
-			pixels[i * 4] = frame.data[i * 3];
-			pixels[i * 4 + 1] = frame.data[i * 3 + 1];
-			pixels[i * 4 + 2] = frame.data[i * 3 + 2];
-			pixels[i * 4 + 3] = 255;
-		}
-
-		webcamImage.create(frame.cols, frame.rows, pixels);
-		webcamTexture.loadFromImage(webcamImage);
-		webcamSprite.setTexture(webcamTexture);
+		return;
 	}
+	cv::Mat frame = camera->getFrame();
+	int frameWidth = frame.cols;
+	int frameHeight = frame.rows;
+	sf::Uint8* pixels = new sf::Uint8[4 * frameWidth * frameHeight];
+	for (int i = 0; i < frameWidth; i++)
+	{
+		for (int j = 0; j < frameHeight; j++)
+		{
+			cv::Vec3b color = frame.at<cv::Vec3b>(j, i);
+			pixels[(i + j * frameWidth) * 4] = color[2];
+			pixels[(i + j * frameWidth) * 4 + 1] = color[1];
+			pixels[(i + j * frameWidth) * 4 + 2] = color[0];
+			pixels[(i + j * frameWidth) * 4 + 3] = 255;
+		}
+	}
+	webcamImage->create(frameWidth, frameHeight, pixels);
+	delete[] pixels;
+	webcamTexture->loadFromImage(*webcamImage);
+	webcamSprite->setTexture(*webcamTexture);
 }
 
 StateMachine::State GameUI::handleEvent(sf::Event event)

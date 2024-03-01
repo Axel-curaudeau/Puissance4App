@@ -10,8 +10,8 @@ uiController::uiController(sf::Vector2u windowSize)
 	if (!font->loadFromFile(fontPath)) {
 		std::cerr << "Add the font file here :" << fontPath << std::endl;
 	}
-	mainMenu = MainMenu(font);
-	game = GameUI(font);
+	mainMenu = new MainMenu(font);
+	gameUI = new GameUI(font);
 }
 
 StateMachine::State uiController::tick(StateMachine::State actualState)
@@ -26,13 +26,13 @@ StateMachine::State uiController::tick(StateMachine::State actualState)
 			window.setView(sf::View(sf::FloatRect(0, 0, event.size.width, event.size.height)));
 		}
 		if (actualState == StateMachine::State::MainMenu) {
-			StateMachine::State newState = mainMenu.handleEvent(event);
+			StateMachine::State newState = mainMenu->handleEvent(event);
 			if (newState != StateMachine::State::MainMenu) {
 				return newState;
 			}
 		}
 		if (actualState == StateMachine::State::Game) {
-			StateMachine::State newState = game.handleEvent(event);
+			StateMachine::State newState = gameUI->handleEvent(event);
 			if (newState != StateMachine::State::Game) {
 				return newState;
 			}
@@ -42,11 +42,11 @@ StateMachine::State uiController::tick(StateMachine::State actualState)
 	window.clear();
 
 	if (actualState == StateMachine::State::MainMenu) {
-		mainMenu.updateButton(window.getSize());
-		mainMenu.draw(window);
+		mainMenu->updateButton(window.getSize());
+		mainMenu->draw(window);
 	}
 	else if (actualState == StateMachine::State::Game) {
-		game.draw(window);
+		gameUI->draw(window);
 	}
 
 	window.display();
@@ -54,12 +54,22 @@ StateMachine::State uiController::tick(StateMachine::State actualState)
 	return actualState;
 }
 
+sf::RenderWindow& uiController::getWindow()
+{
+	return window;
+}
+
 void uiController::stop(StateMachine::State actualState)
 {
 	if (actualState == StateMachine::State::MainMenu) {
-		mainMenu.~MainMenu();
+		mainMenu->~MainMenu();
 	}
 	else if (actualState == StateMachine::State::Game) {
-		game.~GameUI();
+		gameUI->~GameUI();
 	}
+}
+
+GameUI* uiController::getGameUI()
+{
+	return gameUI;
 }

@@ -9,13 +9,14 @@ class uiController {
 public:
 	uiController(sf::Vector2u windowSize);
 	StateMachine::State tick(StateMachine::State actualState);
-	sf::RenderWindow& getWindow() { return window; }
+	sf::RenderWindow& getWindow();
 	sf::Font* font;
 	void stop(StateMachine::State actualState);
+	GameUI* getGameUI();
 
 private:
 	sf::RenderWindow window;
 	std::string fontPath = ".\\Ressources\\Hanged_Letters.ttf";
-	MainMenu mainMenu;
-	GameUI game;
+	MainMenu* mainMenu;
+	GameUI* gameUI;
 };
