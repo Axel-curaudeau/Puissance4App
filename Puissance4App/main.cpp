@@ -49,9 +49,10 @@ int main()
 
 		uiController.getGameUI()->getImageFromCamera(camera);
 
+		//Debugging BoardDetection
 		cv::Mat frame = camera->getFrame();
 		std::vector<cv::Vec3f> circles = BoardDetection::detectCircle(frame);
-		cv::Vec3f firstCircle = BoardDetection::searchFirstCircle(frame, circles);
+		cv::Vec3f firstCircle = BoardDetection::searchFirstCircle(frame, circles, cv::Vec3b(0, 0, 255));
 	}
 	uiController.stop(stateMachine.getState());
 	return 0;
