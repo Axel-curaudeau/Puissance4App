@@ -51,8 +51,14 @@ int main()
 
 		//Debugging BoardDetection
 		cv::Mat frame = camera->getFrame();
+		if (frame.empty())
+		{
+			continue;
+		}
 		std::vector<cv::Vec3f> circles = BoardDetection::detectCircle(frame);
-		cv::Vec3f firstCircle = BoardDetection::searchFirstCircle(frame, circles, cv::Vec3b(0, 0, 255));
+		cv::Vec3f firstCircle = BoardDetection::searchFirstCircle(frame, circles, cv::Vec3b(0, 255, 255));
+		std::vector<cv::Vec3f> boardCircles = BoardDetection::filterCircles(frame, circles, firstCircle);
+		std::vector<cv::Vec3f> sortedCircles = BoardDetection::sortCircles(boardCircles);
 	}
 	uiController.stop(stateMachine.getState());
 	return 0;
