@@ -48,7 +48,7 @@ namespace BoardDetection {
 	/// <param name="image">Source image containing the board</param>
 	/// <param name="boardCircles">Vector containing the circles from the board and in a correct order</param>
 	/// <returns>A board object describing the status of the game</returns>
-	Board detectColor(cv::Mat image, std::vector<cv::Vec3f> boardCircles);
+	Board detectColors(cv::Mat image, std::vector<cv::Vec3f> boardCircles, cv::Vec3b playerColor, cv::Vec3b robotColor);
 
 	/// <summary>
 	/// Get the color of the circle
@@ -57,5 +57,7 @@ namespace BoardDetection {
 	/// <param name="circle">Coordinates of the circle (x, y, radius)</param>
 	/// <returns>RGB color inside the circle</returns>
 	cv::Vec3b getColor(cv::Mat image, cv::Vec3f circle);
+
+	uint compareColors(cv::Vec3b color1, cv::Vec3b color2);
 }
 

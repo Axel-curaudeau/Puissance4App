@@ -28,13 +28,8 @@ cv::Vec3f BoardDetection::searchFirstCircle(cv::Mat image, std::vector<cv::Vec3f
 	{
 		cv::Vec3b detectedColor = getColor(image, circles[i]);
 
-		uint r = 0.5 * (playerColor[0] + detectedColor[0]);
-		uint deltaR_square = pow(playerColor[0] - detectedColor[0], 2);
-		uint deltaG_square = pow(playerColor[1] - detectedColor[1], 2);
-		uint deltaB_square = pow(playerColor[2] - detectedColor[2], 2);
-		uint deltaC = sqrt((2 + (r / 256)) * deltaR_square + 4 * deltaG_square + (2 + ((255 - r) / 256)) * deltaB_square);
-
-		//std::cout << "DeltaC : " << deltaC << std::endl;
+		
+		uint deltaC = compareColors(detectedColor, playerColor);
 
 		if (deltaC < closestCircleValue)
 		{
@@ -144,10 +139,50 @@ std::vector<cv::Vec3f> BoardDetection::sortCircles(std::vector<cv::Vec3f> boardC
 	return sortedCircles;
 }
 
+Board BoardDetection::detectColors(cv::Mat image, std::vector<cv::Vec3f> boardCircles, cv::Vec3b playerColor, cv::Vec3b robotColor)
+{
+	if (boardCircles.size() != 42)
+	{
+		return Board();
+	}
+
+	Board board;
+	uint playerThreshold = 400;
+	uint robotThreshold = 300;
+
+	for (int i = 0; i < boardCircles.size(); i++)
+	{
+		cv::Vec3b color = getColor(image, boardCircles[i]);
+		uint deltaCPlayer = compareColors(color, playerColor);
+		uint deltaCRobot = compareColors(color, robotColor);
+		std::cout << i <<  " DeltaCPlayer: " << deltaCPlayer << " DeltaCRobot: " << deltaCRobot << std::endl;
+		if (deltaCPlayer < playerThreshold)
+		{
+			board.setPlayerPiece(i % 7, i / 7, true);
+		}
+		else if (deltaCRobot < robotThreshold)
+		{
+			board.setRobotPiece(i % 7, i / 7, true);
+		}
+	}
+
+	return board;
+}
+
 cv::Vec3b BoardDetection::getColor(cv::Mat image, cv::Vec3f circle)
 {
 	cv::Mat mask = cv::Mat::zeros(image.size(), CV_8UC1);
 	cv::circle(mask, cv::Point(circle[0], circle[1]), circle[2], cv::Scalar(255), -1);
 	cv::Scalar mean = cv::mean(image, mask);
 	return cv::Vec3b(mean[0], mean[1], mean[2]);
+}
+
+uint BoardDetection::compareColors(cv::Vec3b color1, cv::Vec3b color2)
+{
+	uint r = 0.5 * (color1[0] + color2[0]);
+	uint deltaR_square = pow(color1[0] - color2[0], 2);
+	uint deltaG_square = pow(color1[1] - color2[1], 2);
+	uint deltaB_square = pow(color1[2] - color2[2], 2);
+	uint deltaC = sqrt((2 + (r / 256)) * deltaR_square + 4 * deltaG_square + (2 + ((255 - r) / 256)) * deltaB_square);
+	return deltaC;
 }

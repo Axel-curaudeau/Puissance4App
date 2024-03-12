@@ -116,6 +116,25 @@ void Board::printBoard()
 	std::cout << "1 2 3 4 5 6 7" << std::endl;
 }
 
+void Board::setPlayerPiece(int column, int row, bool value)
+{
+	setPiece(column, row, &playerBoard, value);
+}
+
+void Board::setRobotPiece(int column, int row, bool value)
+{
+	setPiece(column, row, &robotBoard, value);
+}
+
+bool Board::isEmpty()
+{
+	if (playerBoard == 0 && robotBoard == 0)
+	{
+		return true;
+	}
+	return false;
+}
+
 bool Board::getPiece(int column, int row, unsigned __int64 board)
 {
 	unsigned __int64 mask = 1;

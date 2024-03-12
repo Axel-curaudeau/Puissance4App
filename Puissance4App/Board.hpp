@@ -17,6 +17,9 @@ public:
 	bool isValidMove(int column);
 	int getMoveNumber();
 	void printBoard();
+	void setPlayerPiece(int column, int row, bool value);
+	void setRobotPiece(int column, int row, bool value);
+	bool isEmpty();
 
 private:
 	unsigned __int64 playerBoard;

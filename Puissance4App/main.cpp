@@ -59,6 +59,24 @@ int main()
 		cv::Vec3f firstCircle = BoardDetection::searchFirstCircle(frame, circles, cv::Vec3b(0, 255, 255));
 		std::vector<cv::Vec3f> boardCircles = BoardDetection::filterCircles(frame, circles, firstCircle);
 		std::vector<cv::Vec3f> sortedCircles = BoardDetection::sortCircles(boardCircles);
+
+		if (sortedCircles.size() != 42)
+		{
+			continue;
+		}
+
+		for (int i = 0; i < sortedCircles.size(); i++)
+		{
+			cv::circle(frame, cv::Point(sortedCircles[i][0], sortedCircles[i][1]), sortedCircles[i][2], cv::Scalar(0, 255 * i / 42, 0), 2);
+		}
+		cv::imshow("Circles", frame);
+
+		Board board = BoardDetection::detectColors(frame, sortedCircles, cv::Vec3b(0, 0, 255), cv::Vec3b(0, 255, 255));
+		if (board.isEmpty())
+		{
+			continue;
+		}
+		board.printBoard();
 	}
 	uiController.stop(stateMachine.getState());
 	return 0;
