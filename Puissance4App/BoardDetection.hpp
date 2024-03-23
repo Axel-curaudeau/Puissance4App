@@ -5,6 +5,16 @@
 #include "Board.hpp"
 
 namespace BoardDetection {
+
+
+	enum class Color
+	{
+		RED,
+		YELLOW,
+		EMPTY
+	};
+
+
 	/// <summary>
 	/// Search for circles in a given image using the HoughCircles() function from openCV
 	/// </summary>
@@ -17,26 +27,29 @@ namespace BoardDetection {
 	/// </summary>
 	/// <param name="image">Source image containing the board</param>
 	/// <param name="circles">Vector containing all the circles detected in the image</param>
+	/// <param name="playerColor">Color of the player</param>
 	/// <returns>A vector containing the coordinate of the circle and its radius</returns>
-	cv::Vec3f searchFirstCircle(cv::Mat image, std::vector<cv::Vec3f> circles, cv::Vec3b playerColor);
+	cv::Vec3f searchFirstCircle(cv::Mat image, std::vector<cv::Vec3f> circles, Color playerColor);
 
 	/// <summary>
 	/// Filter the circles to only keep the one from the real board.
 	/// </summary>
 	/// <param name="image">Source image containing the board</param>
 	/// <param name="circles">Vector containing all the circles detected in the image</param>
+	/// <param name="firstCircle">Coordinates of the first circle played by the player</param>
 	/// <returns>A vector containing the 42 coordinate of the circle from the board</returns>
 	std::vector<cv::Vec3f> filterCircles(cv::Mat image, std::vector<cv::Vec3f> circles, cv::Vec3f firstCircle);
 
 	/// <summary>
 	/// Sort the circles from the board in the correct order :
 	/// 
-	/// 36 37 38 39 40 41 42
-	/// 29 30 31 32 33 34 35 
-	/// 22 23 24 25 26 27 28 
-	/// 15 16 17 18 19 20 21
-	/// 8  9  10 11 12 13 14
-	/// 1  2  3  4  5  6  7
+	/// 0 6 12 18 24 30 36
+	/// 1 7 13 19 25 31 37
+	/// 2 8 14 20 26 32 38
+	/// 3 9 15 21 27 33 39
+	/// 4 10 16 22 28 34 40
+	/// 5 11 17 23 29 35 41
+	/// 
 	/// </summary>
 	/// <param name="boardCircles">Vector containing the circles from the board</param>
 	/// <returns>A vector containing the circles from the boars in the correct order</returns>
@@ -48,7 +61,7 @@ namespace BoardDetection {
 	/// <param name="image">Source image containing the board</param>
 	/// <param name="boardCircles">Vector containing the circles from the board and in a correct order</param>
 	/// <returns>A board object describing the status of the game</returns>
-	Board detectColors(cv::Mat image, std::vector<cv::Vec3f> boardCircles, cv::Vec3b playerColor, cv::Vec3b robotColor);
+	Board detectColors(cv::Mat image, std::vector<cv::Vec3f> boardCircles);
 
 	/// <summary>
 	/// Get the color of the circle
@@ -56,8 +69,13 @@ namespace BoardDetection {
 	/// <param name="image">Image containing the circle</param>
 	/// <param name="circle">Coordinates of the circle (x, y, radius)</param>
 	/// <returns>RGB color inside the circle</returns>
-	cv::Vec3b getColor(cv::Mat image, cv::Vec3f circle);
+	cv::Vec3b getCircleMeanColor(cv::Mat image, cv::Vec3f circle);
 
-	uint compareColors(cv::Vec3b color1, cv::Vec3b color2);
+	/// <summary>
+	/// Get the color enum element corresponding to the given RGB color
+	/// </summary>
+	/// <param name="color">RGB color</param>
+	/// <returns>Color enum element</returns>
+	Color getColor(cv::Vec3b color);
 }
 

@@ -13,6 +13,7 @@ Board Board::copy()
 	Board newBoard;
 	newBoard.playerBoard = playerBoard;
 	newBoard.robotBoard = robotBoard;
+	newBoard.moveNumber = moveNumber;
 	return newBoard;
 }
 
@@ -113,7 +114,12 @@ void Board::printBoard()
 		}
 		std::cout << std::endl;
 	}
-	std::cout << "1 2 3 4 5 6 7" << std::endl;
+	std::cout << std::endl;
+
+	if (getMoveNumber() % 2 == 0)
+		std::cout << "Player's turn (X)" << std::endl;
+	else
+		std::cout << "Robot's turn (O)" << std::endl;
 }
 
 void Board::setPlayerPiece(int column, int row, bool value)
@@ -133,6 +139,16 @@ bool Board::isEmpty()
 		return true;
 	}
 	return false;
+}
+
+unsigned __int64 Board::getPlayerBitboard()
+{
+	return playerBoard;
+}
+
+unsigned __int64 Board::getRobotBitboard()
+{
+	return robotBoard;
 }
 
 bool Board::getPiece(int column, int row, unsigned __int64 board)
@@ -210,5 +226,37 @@ bool Board::checkWin(unsigned __int64 board)
 			}
 		}
 	}
+	return false;
+}
+
+/// <summary>
+/// This fonction doses not work for all cases, it is a fast check for win
+/// </summary>
+bool Board::checkWinFast(unsigned __int64 board)
+{
+	unsigned __int64 m = board & (board >> 7);
+	if (m & (m >> 14))
+	{
+		return true;
+	}
+
+	m = board & (board >> 6);
+	if (m & (m >> 12))
+	{
+		return true;
+	}
+
+	m = board & (board >> 8);
+	if (m & (m >> 16))
+	{
+		return true;
+	}
+
+	m = board & (board >> 1);
+	if (m & (m >> 2))
+	{
+		return true;
+	}
+
 	return false;
 }

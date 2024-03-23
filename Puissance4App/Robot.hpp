@@ -7,6 +7,9 @@
 class Robot
 {
 public:
+	/// <summary>
+	/// 
+	/// </summary>
 	Robot();
 	~Robot();
 	void connect();

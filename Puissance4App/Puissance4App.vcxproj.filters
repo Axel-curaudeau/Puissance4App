@@ -72,6 +72,9 @@
     <ClCompile Include="BoardDetection.cpp">
       <Filter>Fichiers sources\Camera</Filter>
     </ClCompile>
+    <ClCompile Include="TranspositionTable.cpp">
+      <Filter>Fichiers sources\MinMax</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="uiController.hpp">
@@ -103,6 +106,9 @@
     </ClInclude>
     <ClInclude Include="BoardDetection.hpp">
       <Filter>Fichiers d%27en-tête\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="TranspositionTable.hpp">
+      <Filter>Fichiers d%27en-tête\MinMax</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

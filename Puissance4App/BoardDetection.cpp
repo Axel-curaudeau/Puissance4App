@@ -15,7 +15,7 @@ std::vector<cv::Vec3f> BoardDetection::detectCircle(cv::Mat frame)
 	return circles;
 }
 
-cv::Vec3f BoardDetection::searchFirstCircle(cv::Mat image, std::vector<cv::Vec3f> circles, cv::Vec3b playerColor)
+cv::Vec3f BoardDetection::searchFirstCircle(cv::Mat image, std::vector<cv::Vec3f> circles, Color playerColor)
 {
 	if (circles.size() == 0)
 	{
@@ -26,15 +26,26 @@ cv::Vec3f BoardDetection::searchFirstCircle(cv::Mat image, std::vector<cv::Vec3f
 	uint closestCircleValue = 1000000;
 	for (int i = 0; i < circles.size(); i++)
 	{
-		cv::Vec3b detectedColor = getColor(image, circles[i]);
+		cv::Vec3b detectedColor = getCircleMeanColor(image, circles[i]);
 
 		
-		uint deltaC = compareColors(detectedColor, playerColor);
+		/*uint deltaC = compareRGBColors(detectedColor, playerColor);
 
 		if (deltaC < closestCircleValue)
 		{
 			closestCircleValue = deltaC;
 			closestCircleIndex = i;
+		}*/
+
+		Color detectedColorType = getColor(detectedColor);
+		if (detectedColorType == Color::EMPTY)
+		{
+			continue;
+		}
+		if (detectedColorType == playerColor)
+		{
+			closestCircleIndex = i;
+			break;
 		}
 	}
 	cv::Vec3f firstCircle = circles[closestCircleIndex];
@@ -96,19 +107,17 @@ std::vector<cv::Vec3f> BoardDetection::sortCircles(std::vector<cv::Vec3f> boardC
 	std::vector<cv::Vec3f> sortedCircles;
 
 	//For all the columns
-	for (uint i = 0; i < 6; i++)
+	for (uint i = 0; i < 7; i++)
 	{
-		uint minX = 1000000;
-		uint minY = 1000000;
+		uint min = 1000000;
 		uint minIndex = 0;
 
 		//Search the first circle at minimum x and y
 		for (int j = 0; j < boardCircles.size(); j++)
 		{
-			if (boardCircles[j][0] < minX && boardCircles[j][1] < minY)
+			if (boardCircles[j][0] + boardCircles[j][1] < min)
 			{
-				minX = boardCircles[j][0];
-				minY = boardCircles[j][1];
+				min = boardCircles[j][0] + boardCircles[j][1];
 				minIndex = j;
 			}
 		}
@@ -118,16 +127,16 @@ std::vector<cv::Vec3f> BoardDetection::sortCircles(std::vector<cv::Vec3f> boardC
 		//Remove the first circle from the boardCircles vector
 		boardCircles.erase(boardCircles.begin() + minIndex);
 
-		//Search the next 6 circles in the same line
-		for (int j = 0; j < 6; j++)
+		//Search the next 5 circles in the same line
+		for (int j = 0; j < 5; j++)
 		{
-			minX = 1000000;
+			min = 1000000;
 			minIndex = 0;
 			for (int j = 0; j < boardCircles.size(); j++)
 			{
-				if (boardCircles[j][0] < minX)
+				if (abs(boardCircles[j][0] - sortedCircles[i * 6][0]) < sortedCircles[i*6][2] && boardCircles[j][1] < min)
 				{
-					minX = boardCircles[j][0];
+					min = boardCircles[j][1];
 					minIndex = j;
 				}
 			}
@@ -139,7 +148,7 @@ std::vector<cv::Vec3f> BoardDetection::sortCircles(std::vector<cv::Vec3f> boardC
 	return sortedCircles;
 }
 
-Board BoardDetection::detectColors(cv::Mat image, std::vector<cv::Vec3f> boardCircles, cv::Vec3b playerColor, cv::Vec3b robotColor)
+Board BoardDetection::detectColors(cv::Mat image, std::vector<cv::Vec3f> boardCircles)
 {
 	if (boardCircles.size() != 42)
 	{
@@ -147,42 +156,50 @@ Board BoardDetection::detectColors(cv::Mat image, std::vector<cv::Vec3f> boardCi
 	}
 
 	Board board;
-	uint playerThreshold = 400;
-	uint robotThreshold = 300;
+	uint playerThreshold = 200;
+	uint robotThreshold = 150;
 
 	for (int i = 0; i < boardCircles.size(); i++)
 	{
-		cv::Vec3b color = getColor(image, boardCircles[i]);
-		uint deltaCPlayer = compareColors(color, playerColor);
-		uint deltaCRobot = compareColors(color, robotColor);
-		std::cout << i <<  " DeltaCPlayer: " << deltaCPlayer << " DeltaCRobot: " << deltaCRobot << std::endl;
-		if (deltaCPlayer < playerThreshold)
+		cv::Vec3b pieceColor = getCircleMeanColor(image, boardCircles[i]);
+		cv::circle(image, cv::Point(boardCircles[i][0], boardCircles[i][1]), boardCircles[i][2] - 5, cv::Scalar(pieceColor[0], pieceColor[1], pieceColor[2]), -1);
+
+		//à tester en profondeur
+		if (abs(pieceColor[0] - pieceColor[1]) < 60 && abs(pieceColor[1] - pieceColor[2]) < 60 && abs(pieceColor[0] - pieceColor[2]) < 60)
 		{
-			board.setPlayerPiece(i % 7, i / 7, true);
+			continue;
 		}
-		else if (deltaCRobot < robotThreshold)
+		if (abs(pieceColor[0] - pieceColor[1]) > 50 && abs(pieceColor[0] - pieceColor[2]) > 50)
 		{
-			board.setRobotPiece(i % 7, i / 7, true);
+			board.setPlayerPiece(i / 6, 5 - i % 6, true);
+		}
+		else
+		{
+			board.setRobotPiece(i / 6, 5 - i % 6, true);
 		}
 	}
+	cv::imshow("Debug", image);
 
 	return board;
 }
 
-cv::Vec3b BoardDetection::getColor(cv::Mat image, cv::Vec3f circle)
+cv::Vec3b BoardDetection::getCircleMeanColor(cv::Mat image, cv::Vec3f circle)
 {
 	cv::Mat mask = cv::Mat::zeros(image.size(), CV_8UC1);
-	cv::circle(mask, cv::Point(circle[0], circle[1]), circle[2], cv::Scalar(255), -1);
+	cv::circle(mask, cv::Point(circle[0], circle[1]), circle[2] - 5, cv::Scalar(255), -1);	
 	cv::Scalar mean = cv::mean(image, mask);
 	return cv::Vec3b(mean[0], mean[1], mean[2]);
 }
 
-uint BoardDetection::compareColors(cv::Vec3b color1, cv::Vec3b color2)
+BoardDetection::Color BoardDetection::getColor(cv::Vec3b color)
 {
-	uint r = 0.5 * (color1[0] + color2[0]);
-	uint deltaR_square = pow(color1[0] - color2[0], 2);
-	uint deltaG_square = pow(color1[1] - color2[1], 2);
-	uint deltaB_square = pow(color1[2] - color2[2], 2);
-	uint deltaC = sqrt((2 + (r / 256)) * deltaR_square + 4 * deltaG_square + (2 + ((255 - r) / 256)) * deltaB_square);
-	return deltaC;
+	if (abs(color[0] - color[1]) < 60 && abs(color[1] - color[2]) < 60 && abs(color[0] - color[2]) < 60)
+	{
+		return Color::EMPTY;
+	}
+	if (abs(color[0] - color[1]) > 50 && abs(color[0] - color[2]) > 50)
+	{
+		return Color::RED;
+	}
+	return Color::YELLOW;
 }

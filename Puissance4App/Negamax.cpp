@@ -1,7 +1,8 @@
 #include "Negamax.hpp"
 
-int Negamax::GetBestMove(Board board)
+int Negamax::GetBestMove(Board board, TranspositionTable* transpositionTable, unsigned int depth)
 {
+	
 	std::thread columnThreads[7];
 	int* results = new int[7];
 
@@ -16,7 +17,7 @@ int Negamax::GetBestMove(Board board)
 		{
 			Board newBoard = board.copy();
 			newBoard.Play(i);
-			columnThreads[i] = std::thread(NegamaxThread, newBoard, &results[i]);
+			columnThreads[i] = std::thread(NegamaxThread, newBoard, &results[i], transpositionTable, depth);
 		}
 		else
 		{
@@ -30,7 +31,16 @@ int Negamax::GetBestMove(Board board)
 			columnThreads[i].join();
 		}
 	}
+
+	std::cout << "Results: ";
+	for (int i = 0; i < 7; i++)
+	{
+		std::cout << results[i] << " ";
+	}
+	std::cout << std::endl;
+
 	int bestMove = 0;
+
 	int bestValue = -1000;
 	for (int i = 0; i < 7; i++)
 	{
@@ -39,59 +49,68 @@ int Negamax::GetBestMove(Board board)
 			bestValue = results[i];
 			bestMove = i;
 		}
-		std::cout << results[i] << std::endl;
 	}
 	return bestMove;
 }
 
-int Negamax::Evaluate(Board board)
+int Negamax::Evaluate(Board terminalBoard)
 {
-	if (board.playerWins())
+	
+	if (terminalBoard.playerWins())
 	{
-		return -42 + board.getMoveNumber();
+		return -43 + terminalBoard.getMoveNumber();
 	}
-	else if (board.robotWins())
+	else if (terminalBoard.robotWins())
 	{
-		return 42 - board.getMoveNumber();
-	}
-	else if (board.draw())
-	{
-		return 0;
+		return 43 - terminalBoard.getMoveNumber();
 	}
 	else
 	{
-		throw new std::exception("Board is not terminal or invalid move");
 		return 0;
 	}
 }
 
-int Negamax::Negamax(Board board, int depth)
+int Negamax::Negamax(Board board, int alpha, int beta, TranspositionTable* transpositionTable, unsigned int depth)
 {
-	if (board.isTerminal())
+	/*
+	if (transpositionTable->contains(board))
 	{
-		return Negamax::Evaluate(board);
+		return transpositionTable->get(board);
+	}
+	*/
+	if (depth == 0 || board.isTerminal())
+	{
+		int value = Negamax::Evaluate(board);
+		return value;
 	}
 	else
 	{
-		int bestValue = -1000;
+		int value = -1000;
 		for (int i = 0; i < 7; i++)
 		{
 			if (board.isValidMove(i))
 			{
 				Board boardCopy = board.copy();
 				boardCopy.Play(i);
-				int value = Negamax::Negamax(boardCopy, depth + 1);
-				if (value > bestValue)
+				value = std::max(value, -Negamax::Negamax(boardCopy, -beta, -alpha, transpositionTable, depth - 1));
+				alpha = std::max(alpha, value);
+				if (alpha >= beta)
 				{
-					bestValue = value;
+					continue;
 				}
 			}
 		}
-		return bestValue;
+		/*
+		if (board.isTerminal())
+		{
+			transpositionTable->put(board, value);
+		}*/
+		
+		return value;
 	}
 }
 
-void Negamax::NegamaxThread(Board board, int* result)
+void Negamax::NegamaxThread(Board board, int* result, TranspositionTable* transpositionTable, unsigned int depth)
 {
-	*result = Negamax::Negamax(board);
+	*result = Negamax::Negamax(board, -100000, 100000, transpositionTable, depth);
 }

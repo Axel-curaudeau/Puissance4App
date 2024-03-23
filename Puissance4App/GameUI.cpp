@@ -52,13 +52,12 @@ void GameUI::draw(sf::RenderWindow& window)
 	window.draw(*webcamSprite);
 }
 
-void GameUI::getImageFromCamera(Camera* camera)
+void GameUI::getCameraFrame(cv::Mat frame)
 {
-	if (camera->getFrame().empty())
+	if (frame.empty())
 	{
 		return;
 	}
-	cv::Mat frame = camera->getFrame();
 	int frameWidth = frame.cols;
 	int frameHeight = frame.rows;
 	sf::Uint8* pixels = new sf::Uint8[4 * frameWidth * frameHeight];

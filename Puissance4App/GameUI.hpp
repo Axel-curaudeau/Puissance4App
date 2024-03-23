@@ -16,7 +16,7 @@ public:
 	~GameUI();
 	GameUI(sf::Font* font);
 	void draw(sf::RenderWindow& window);
-	void getImageFromCamera(Camera* camera);
+	void getCameraFrame(cv::Mat frame);
 	StateMachine::State handleEvent(sf::Event event);
 
 private:
