@@ -6,10 +6,28 @@ class Button
 public:
 	Button();
 
-	sf::Vector2f getButtonSize() { return buttonSize; }
+	/// <summary>
+	/// Get the button size
+	/// </summary>
+	/// <returns></returns>
+	sf::Vector2f getButtonSize();
 
+	/// <summary>
+	/// Set the button color
+	/// </summary>
+	/// <param name="color">Color of the button using a Color type from SFML library</param>
 	void setButtonColor(sf::Color color);
+
+	/// <summary>
+	/// Set the button size
+	/// </summary>
+	/// <param name="size">Size vector containing the width and height of the button</param>
 	void setButtonSize(sf::Vector2f size);
+
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <param name="position"></param>
 	void setButtonPosition(sf::Vector2f position);
 	void setButtonTextColor(sf::Color color);
 	void setButtonText(std::string text);

@@ -6,6 +6,11 @@ Button::Button()
 	buttonRect.setOutlineColor(sf::Color::White);
 }
 
+sf::Vector2f Button::getButtonSize()
+{
+	return buttonSize;
+}
+
 void Button::setButtonColor(sf::Color color)
 {
 	buttonColor = color;
