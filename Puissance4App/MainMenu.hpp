@@ -4,6 +4,9 @@
 #include "Button.hpp"
 #include "StateMachine.hpp"
 
+/// <summary>
+/// This class is responsible for the main menu of the game.
+/// </summary>
 class MainMenu {
 public:
 	MainMenu();

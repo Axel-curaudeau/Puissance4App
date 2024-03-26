@@ -2,17 +2,22 @@
 
 int Negamax::GetBestMove(Board board, TranspositionTable* transpositionTable, unsigned int depth)
 {
-	
+	//One thread for each column
 	std::thread columnThreads[7];
+
+	//Array to store the results of the threads
 	int* results = new int[7];
 
+	//Initialize the results array
 	for (int i = 0; i < 7; i++)
 	{
 		results[i] = -1000;
 	}
 
+	//For each column, play the move inside it, and create a new thread to calculate the value of the move
 	for (int i = 0; i < 7; i++)
 	{
+		//Check if the move can be played in the column
 		if (board.isValidMove(i))
 		{
 			Board newBoard = board.copy();
@@ -24,6 +29,8 @@ int Negamax::GetBestMove(Board board, TranspositionTable* transpositionTable, un
 			columnThreads[i] = std::thread();
 		}
 	}
+
+	//Join all the threads to wait for them to finish
 	for (int i = 0; i < 7; i++)
 	{
 		if (columnThreads[i].joinable())
@@ -32,6 +39,7 @@ int Negamax::GetBestMove(Board board, TranspositionTable* transpositionTable, un
 		}
 	}
 
+	//Print the results of each column
 	std::cout << "Results: ";
 	for (int i = 0; i < 7; i++)
 	{
@@ -40,8 +48,9 @@ int Negamax::GetBestMove(Board board, TranspositionTable* transpositionTable, un
 	std::cout << std::endl;
 
 	int bestMove = 0;
-
 	int bestValue = -1000;
+
+	//Find the best move with the highest value
 	for (int i = 0; i < 7; i++)
 	{
 		if (results[i] > bestValue)
@@ -55,7 +64,6 @@ int Negamax::GetBestMove(Board board, TranspositionTable* transpositionTable, un
 
 int Negamax::Evaluate(Board terminalBoard)
 {
-	
 	if (terminalBoard.playerWins())
 	{
 		return -43 + terminalBoard.getMoveNumber();
@@ -72,6 +80,10 @@ int Negamax::Evaluate(Board terminalBoard)
 
 int Negamax::Negamax(Board board, int alpha, int beta, TranspositionTable* transpositionTable, unsigned int depth)
 {
+	//The transposition table is not working properly, so it is commented out
+	//It is supposed to store the values of the boards that have already been evaluated
+	//and return the value if the board is already in the table, instead of evaluating it again
+	//This is supposed to speed up the algorithm, but it is not
 	/*
 	if (transpositionTable->contains(board))
 	{

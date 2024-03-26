@@ -18,6 +18,35 @@ namespace Puissance4AppTests
 			Assert::IsFalse(board.isTerminal());
 		}
 
+		TEST_METHOD(Board_copy)
+		{
+			Board board;
+			board.Play(0);
+			Board newBoard = board.copy();
+			Assert::AreEqual(board.getMoveNumber(), newBoard.getMoveNumber());
+			Assert::AreEqual(board.isEmpty(), newBoard.isEmpty());
+			Assert::AreEqual(board.isFull(), newBoard.isFull());
+			Assert::AreEqual(board.isTerminal(), newBoard.isTerminal());
+			Assert::AreEqual(board.playerWins(), newBoard.playerWins());
+			Assert::AreEqual(board.robotWins(), newBoard.robotWins());
+		}
+
+		TEST_METHOD(IsTerminal_NotTerminalBoard)
+		{
+			Board board;
+			Assert::IsFalse(board.isTerminal());
+		}
+
+		TEST_METHOD(IsTerminal_TerminalBoard)
+		{
+			Board board;
+			board.Play(0); board.Play(1);
+			board.Play(0); board.Play(1);
+			board.Play(0); board.Play(1);
+			board.Play(0);
+			Assert::IsTrue(board.isTerminal());
+		}
+
 		TEST_METHOD(BoardWithOnePiece)
 		{
 			Board board;
@@ -57,18 +86,7 @@ namespace Puissance4AppTests
 			Assert::IsTrue(board.robotWins());
 		}
 
-		TEST_METHOD(Board_copy)
-		{
-			Board board;
-			board.Play(0);
-			Board newBoard = board.copy();
-			Assert::AreEqual(board.getMoveNumber(), newBoard.getMoveNumber());
-			Assert::AreEqual(board.isEmpty(), newBoard.isEmpty());
-			Assert::AreEqual(board.isFull(), newBoard.isFull());
-			Assert::AreEqual(board.isTerminal(), newBoard.isTerminal());
-			Assert::AreEqual(board.playerWins(), newBoard.playerWins());
-			Assert::AreEqual(board.robotWins(), newBoard.robotWins());
-		}
+		
 
 		TEST_METHOD(Board_CheckWinFast_PlayerWinVertical)
 		{

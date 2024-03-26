@@ -5,6 +5,9 @@
 #include <iostream>
 #include "GameUI.hpp"
 
+/// <summary>
+/// This class is the controller of the UI, it will manage the window and the different states of the game (main menu, game, etc)
+/// </summary>
 class uiController {
 public:
 	uiController(sf::Vector2u windowSize);

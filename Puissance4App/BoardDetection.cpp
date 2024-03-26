@@ -7,8 +7,11 @@ std::vector<cv::Vec3f> BoardDetection::detectCircle(cv::Mat frame)
 		return std::vector<cv::Vec3f>();
 	}
 
+	//Convert the frame to gray
 	cv::Mat grayFrame;
 	cv::cvtColor(frame, grayFrame, cv::COLOR_BGR2GRAY);
+
+	//Search for circles in the frame
 	std::vector<cv::Vec3f> circles;
 	cv::HoughCircles(grayFrame, circles, cv::HOUGH_GRADIENT, 0.5, grayFrame.rows / 12, 200, 30, grayFrame.rows / 24, grayFrame.rows / 6);
 
@@ -22,20 +25,12 @@ cv::Vec3f BoardDetection::searchFirstCircle(cv::Mat image, std::vector<cv::Vec3f
 		return cv::Vec3f();
 	}
 
+	//Search the first circle with the player color inside
 	uint closestCircleIndex = 0;
 	uint closestCircleValue = 1000000;
 	for (int i = 0; i < circles.size(); i++)
 	{
 		cv::Vec3b detectedColor = getCircleMeanColor(image, circles[i]);
-
-		
-		/*uint deltaC = compareRGBColors(detectedColor, playerColor);
-
-		if (deltaC < closestCircleValue)
-		{
-			closestCircleValue = deltaC;
-			closestCircleIndex = i;
-		}*/
 
 		Color detectedColorType = getColor(detectedColor);
 		if (detectedColorType == Color::EMPTY)
@@ -49,6 +44,8 @@ cv::Vec3f BoardDetection::searchFirstCircle(cv::Mat image, std::vector<cv::Vec3f
 		}
 	}
 	cv::Vec3f firstCircle = circles[closestCircleIndex];
+
+	//Remove the first circle from the circles vector
 	circles.erase(circles.begin() + closestCircleIndex);
 	return firstCircle;
 }
@@ -89,6 +86,7 @@ std::vector<cv::Vec3f> BoardDetection::filterCircles(cv::Mat image, std::vector<
 		}
 	}
 
+	//If the board is not complete
 	if (boardCircles.size() != 42)
 	{
 		return std::vector<cv::Vec3f>();
@@ -162,31 +160,41 @@ Board BoardDetection::detectColors(cv::Mat image, std::vector<cv::Vec3f> boardCi
 	for (int i = 0; i < boardCircles.size(); i++)
 	{
 		cv::Vec3b pieceColor = getCircleMeanColor(image, boardCircles[i]);
+
+		//Draw the circle with the detected color for debug
 		cv::circle(image, cv::Point(boardCircles[i][0], boardCircles[i][1]), boardCircles[i][2] - 5, cv::Scalar(pieceColor[0], pieceColor[1], pieceColor[2]), -1);
 
-		//à tester en profondeur
+		//If the color is too close to white, it is empty
 		if (abs(pieceColor[0] - pieceColor[1]) < 60 && abs(pieceColor[1] - pieceColor[2]) < 60 && abs(pieceColor[0] - pieceColor[2]) < 60)
 		{
 			continue;
 		}
+
+		//If the color is close to red, it is a player piece (change to adapt to the color choosen by the player)
 		if (abs(pieceColor[0] - pieceColor[1]) > 50 && abs(pieceColor[0] - pieceColor[2]) > 50)
 		{
 			board.setPlayerPiece(i / 6, 5 - i % 6, true);
 		}
+
+		//If the color is close to yellow, it is a robot piece (change to adapt to the color choosen by the player)
 		else
 		{
 			board.setRobotPiece(i / 6, 5 - i % 6, true);
 		}
 	}
-	cv::imshow("Debug", image);
+	//Uncomment to show the debug image with the detected circles
+	//cv::imshow("Debug", image);
 
 	return board;
 }
 
 cv::Vec3b BoardDetection::getCircleMeanColor(cv::Mat image, cv::Vec3f circle)
 {
+	//Create a mask to get only the circle pixels
 	cv::Mat mask = cv::Mat::zeros(image.size(), CV_8UC1);
 	cv::circle(mask, cv::Point(circle[0], circle[1]), circle[2] - 5, cv::Scalar(255), -1);	
+
+	//Get the mean color of the circle
 	cv::Scalar mean = cv::mean(image, mask);
 	return cv::Vec3b(mean[0], mean[1], mean[2]);
 }

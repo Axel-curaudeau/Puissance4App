@@ -32,7 +32,7 @@ namespace BoardDetection {
 	cv::Vec3f searchFirstCircle(cv::Mat image, std::vector<cv::Vec3f> circles, Color playerColor);
 
 	/// <summary>
-	/// Filter the circles to only keep the one from the real board.
+	/// Filter the circles to only keep the one from the real board using their position
 	/// </summary>
 	/// <param name="image">Source image containing the board</param>
 	/// <param name="circles">Vector containing all the circles detected in the image</param>
