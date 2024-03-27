@@ -24,18 +24,18 @@ Robot::~Robot()
 {
 }
 
-void Robot::connect()
+bool Robot::connect()
 {
 	char dobotPortName[64];
 	int dobotSearchCount = SearchDobot(dobotPortName, 64);
 
 	if (dobotSearchCount == 0) {
 		std::cerr << "No dobot found" << std::endl;
-		return;
+		return false;
 	}
 	else if (dobotSearchCount > 1) {
-		std::cerr << "Multiple dobot found" << std::endl;
-		return;
+		std::cerr << "Multiple dobot found. Please connect only one dobot" << std::endl;
+		return false;
 	}
 
 	int connectDobotResult = ConnectDobot(dobotPortName, 115200, nullptr, nullptr, &dobotId);
@@ -49,7 +49,7 @@ void Robot::connect()
 			std::cerr << "Dobot port occupied";
 			break;
 		}
-		return;
+		return 1;
 	}
 
 	std::cout << "Connected to dobot" << std::endl;
@@ -57,16 +57,17 @@ void Robot::connect()
 	int resultClearAllAlarms = ClearAllAlarmsState(dobotId);
 	if (resultClearAllAlarms != DobotCommunicate_NoError) {
 		std::cerr << "Failed to clear all alarms" << std::endl;
-		return;
+		return false;
 	}
 	
 	JOGCoordinateParams* jogCoordinateParams = new JOGCoordinateParams;
 	int result = GetJOGCoordinateParams(dobotId, jogCoordinateParams);
 	if (result != DobotCommunicate_NoError) {
 		std::cerr << "Failed to get jog coordinate params" << std::endl;
-		return;
+		return false;
 	}
 	std::cout << "JOGCoordinateParams: velocityX = " << jogCoordinateParams->velocity[0] << ", velocityY = " << jogCoordinateParams->velocity[1] << ", velocityZ = " << jogCoordinateParams->velocity[2] << ", velocityR = " << jogCoordinateParams->velocity[3] << std::endl;
+	return true;
 }
 
 void Robot::Home()

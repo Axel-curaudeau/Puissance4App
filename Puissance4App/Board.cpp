@@ -164,6 +164,15 @@ bool Board::getPiece(int column, int row, unsigned __int64 board)
 
 void Board::setPiece(int column, int row, unsigned __int64* board, bool value)
 {
+	if (value)
+	{
+		moveNumber++;
+	}
+	else
+	{
+		moveNumber--;
+	}
+
 	unsigned __int64 mask = 1;
 	mask = mask << (column + row * 7);
 	if (value)

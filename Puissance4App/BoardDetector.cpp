@@ -1,6 +1,51 @@
-#include "BoardDetection.hpp"
+#include "BoardDetector.hpp"
 
-std::vector<cv::Vec3f> BoardDetection::detectCircle(cv::Mat frame)
+Board BoardDetector::detectBoard(cv::Mat image, Color playerColor)
+{
+	//Detect the circles in the image
+	std::vector<cv::Vec3f> circles = detectCircle(image);
+	if (circles.size() == 0)
+	{
+		std::cout << "No circles detected" << std::endl;
+		return Board();
+	}
+	for (int i = 0; i < circles.size(); i++)
+	{
+		cv::circle(image, cv::Point(circles[i][0], circles[i][1]), circles[i][2], cv::Scalar(255, 255, 255), 2);
+	}
+
+	//Search the first circle played by the player
+	cv::Vec3f firstCircle = searchFirstCircle(image, circles, playerColor);
+	if (firstCircle == cv::Vec3f())
+	{
+		std::cout << "No first circle detected" << std::endl;
+		return Board();
+	}
+	cv::circle(image, cv::Point(firstCircle[0], firstCircle[1]), 5, cv::Scalar(255, 255, 255), -1);
+
+	//Filter the circles to only keep the one from the board
+	std::vector<cv::Vec3f> boardCircles = filterCircles(image, circles, firstCircle);
+	if (boardCircles.size() == 0)
+	{
+		std::cout << "No board circles detected" << std::endl;
+		return Board();
+	}
+
+	//Sort the circles in the correct order
+	std::vector<cv::Vec3f> sortedCircles = sortCircles(boardCircles);
+	if (sortedCircles.size() == 0)
+	{
+		std::cout << "No sorted circles detected" << std::endl;
+		return Board();
+	}
+
+	//Detect the colors of the circles
+	Board board = detectColors(image, sortedCircles);
+
+	return board;
+}
+
+std::vector<cv::Vec3f> BoardDetector::detectCircle(cv::Mat frame)
 {
 	if (frame.empty())
 	{
@@ -18,7 +63,7 @@ std::vector<cv::Vec3f> BoardDetection::detectCircle(cv::Mat frame)
 	return circles;
 }
 
-cv::Vec3f BoardDetection::searchFirstCircle(cv::Mat image, std::vector<cv::Vec3f> circles, Color playerColor)
+cv::Vec3f BoardDetector::searchFirstCircle(cv::Mat image, std::vector<cv::Vec3f> circles, Color playerColor)
 {
 	if (circles.size() == 0)
 	{
@@ -50,7 +95,7 @@ cv::Vec3f BoardDetection::searchFirstCircle(cv::Mat image, std::vector<cv::Vec3f
 	return firstCircle;
 }
 
-std::vector<cv::Vec3f> BoardDetection::filterCircles(cv::Mat image, std::vector<cv::Vec3f> circles, cv::Vec3f firstCircle)
+std::vector<cv::Vec3f> BoardDetector::filterCircles(cv::Mat image, std::vector<cv::Vec3f> circles, cv::Vec3f firstCircle)
 {
 	std::vector<cv::Vec3f> boardCircles;
 	
@@ -68,6 +113,7 @@ std::vector<cv::Vec3f> BoardDetection::filterCircles(cv::Mat image, std::vector<
 
 	if (boardCircles.size() != 7)
 	{
+		std::cout << "Not enough circles in the same line" << std::endl;
 		return std::vector<cv::Vec3f>();
 	}
 
@@ -89,13 +135,14 @@ std::vector<cv::Vec3f> BoardDetection::filterCircles(cv::Mat image, std::vector<
 	//If the board is not complete
 	if (boardCircles.size() != 42)
 	{
+		std::cout << "Not enough circles in the same column" << std::endl;
 		return std::vector<cv::Vec3f>();
 	}
 
 	return boardCircles;
 }
 
-std::vector<cv::Vec3f> BoardDetection::sortCircles(std::vector<cv::Vec3f> boardCircles)
+std::vector<cv::Vec3f> BoardDetector::sortCircles(std::vector<cv::Vec3f> boardCircles)
 {
 	if (boardCircles.size() != 42)
 	{
@@ -146,7 +193,7 @@ std::vector<cv::Vec3f> BoardDetection::sortCircles(std::vector<cv::Vec3f> boardC
 	return sortedCircles;
 }
 
-Board BoardDetection::detectColors(cv::Mat image, std::vector<cv::Vec3f> boardCircles)
+Board BoardDetector::detectColors(cv::Mat image, std::vector<cv::Vec3f> boardCircles)
 {
 	if (boardCircles.size() != 42)
 	{
@@ -164,19 +211,18 @@ Board BoardDetection::detectColors(cv::Mat image, std::vector<cv::Vec3f> boardCi
 		//Draw the circle with the detected color for debug
 		cv::circle(image, cv::Point(boardCircles[i][0], boardCircles[i][1]), boardCircles[i][2] - 5, cv::Scalar(pieceColor[0], pieceColor[1], pieceColor[2]), -1);
 
-		//If the color is too close to white, it is empty
-		if (abs(pieceColor[0] - pieceColor[1]) < 60 && abs(pieceColor[1] - pieceColor[2]) < 60 && abs(pieceColor[0] - pieceColor[2]) < 60)
+		//Detect the color of the circle
+		Color color = getColor(pieceColor);
+
+		if (color == Color::EMPTY)
 		{
 			continue;
 		}
-
-		//If the color is close to red, it is a player piece (change to adapt to the color choosen by the player)
-		if (abs(pieceColor[0] - pieceColor[1]) > 50 && abs(pieceColor[0] - pieceColor[2]) > 50)
+		else if (color == Color::RED)
 		{
+
 			board.setPlayerPiece(i / 6, 5 - i % 6, true);
 		}
-
-		//If the color is close to yellow, it is a robot piece (change to adapt to the color choosen by the player)
 		else
 		{
 			board.setRobotPiece(i / 6, 5 - i % 6, true);
@@ -188,7 +234,7 @@ Board BoardDetection::detectColors(cv::Mat image, std::vector<cv::Vec3f> boardCi
 	return board;
 }
 
-cv::Vec3b BoardDetection::getCircleMeanColor(cv::Mat image, cv::Vec3f circle)
+cv::Vec3b BoardDetector::getCircleMeanColor(cv::Mat image, cv::Vec3f circle)
 {
 	//Create a mask to get only the circle pixels
 	cv::Mat mask = cv::Mat::zeros(image.size(), CV_8UC1);
@@ -199,13 +245,13 @@ cv::Vec3b BoardDetection::getCircleMeanColor(cv::Mat image, cv::Vec3f circle)
 	return cv::Vec3b(mean[0], mean[1], mean[2]);
 }
 
-BoardDetection::Color BoardDetection::getColor(cv::Vec3b color)
+BoardDetector::Color BoardDetector::getColor(cv::Vec3b color)
 {
 	if (abs(color[0] - color[1]) < 60 && abs(color[1] - color[2]) < 60 && abs(color[0] - color[2]) < 60)
 	{
 		return Color::EMPTY;
 	}
-	if (abs(color[0] - color[1]) > 50 && abs(color[0] - color[2]) > 50)
+	if (abs(color[2] - color[0]) > 50 && abs(color[2] - color[1]) > 50)
 	{
 		return Color::RED;
 	}

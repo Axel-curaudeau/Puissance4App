@@ -17,7 +17,8 @@ public:
 	/// <summary>
 	/// Connect to the Dobot and check if it is connected
 	/// </summary>
-	void connect();
+	/// <returns>True if the Dobot is connected, false otherwise</returns>
+	bool connect();
 
 	/// <summary>
 	/// Reset the Dobot to its initial position

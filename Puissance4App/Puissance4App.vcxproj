@@ -135,7 +135,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Board.cpp" />
-    <ClCompile Include="BoardDetection.cpp" />
+    <ClCompile Include="BoardDetector.cpp" />
     <ClCompile Include="Button.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="GameUI.cpp" />
@@ -149,7 +149,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Board.hpp" />
-    <ClInclude Include="BoardDetection.hpp" />
+    <ClInclude Include="BoardDetector.hpp" />
     <ClInclude Include="Button.hpp" />
     <ClInclude Include="Camera.hpp" />
     <ClInclude Include="GameUI.hpp" />
