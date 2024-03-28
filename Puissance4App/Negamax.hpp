@@ -16,6 +16,9 @@ namespace Negamax
 	/// <returns>The index of the column to play the best move</returns>
 	int GetBestMove(Board board, TranspositionTable* transpositionTable, unsigned int depth);
 
+
+	int GetBestMove_noThreads(Board board, TranspositionTable* transpositionTable, unsigned int depth);
+
 	/// <summary>
 	/// Evaluate a Terminal board by giving it a score corresponding to the number of pieces needed to win for the current player.
 	/// </summary>

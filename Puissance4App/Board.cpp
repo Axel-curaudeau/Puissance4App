@@ -31,7 +31,6 @@ void Board::Play(int column)
 			{
 				setPiece(column, row, &robotBoard, true);
 			}
-			moveNumber++;
 			return;
 		}
 	}
@@ -59,16 +58,7 @@ bool Board::robotWins()
 
 bool Board::draw()
 {
-	if (isFull() && !playerWins() && !robotWins())
-	{
-		return true;
-	}
-	return false;
-}
-
-bool Board::isFull()
-{
-	if (getMoveNumber() == 42)
+	if (moveNumber == 42)
 	{
 		return true;
 	}
@@ -267,5 +257,20 @@ bool Board::checkWinFast(unsigned __int64 board)
 		return true;
 	}
 
+	return false;
+}
+
+bool Board::moveIsWinning(int column)
+{
+	Board boardCopy = copy();
+	boardCopy.Play(column);
+	if (boardCopy.playerWins())
+	{
+		return true;
+	}
+	if (boardCopy.robotWins())
+	{
+		return true;
+	}
 	return false;
 }

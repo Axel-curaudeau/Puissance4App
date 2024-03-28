@@ -62,11 +62,34 @@ int Negamax::GetBestMove(Board board, TranspositionTable* transpositionTable, un
 	return bestMove;
 }
 
+int Negamax::GetBestMove_noThreads(Board board, TranspositionTable* transpositionTable, unsigned int depth)
+{
+	int bestMove = 0;
+	int bestValue = -1000;
+
+	for (int i = 0; i < 7; i++)
+	{
+		if (board.isValidMove(i))
+		{
+			Board newBoard = board.copy();
+			newBoard.Play(i);
+			int value = Negamax::Negamax(newBoard, -100000, 100000, transpositionTable, depth - 1);
+			std::cout << "Move " << i << " value: " << value << std::endl;
+			if (value > bestValue)
+			{
+				bestValue = value;
+				bestMove = i;
+			}
+		}
+	}
+	return bestMove;
+}
+
 int Negamax::Evaluate(Board terminalBoard)
 {
 	if (terminalBoard.playerWins())
 	{
-		return -43 + terminalBoard.getMoveNumber();
+		return 43 - terminalBoard.getMoveNumber();
 	}
 	else if (terminalBoard.robotWins())
 	{
@@ -75,6 +98,7 @@ int Negamax::Evaluate(Board terminalBoard)
 	else
 	{
 		return 0;
+		//return (terminalBoard.getMoveNumber() % 2) * -1 * -43;
 	}
 }
 
@@ -90,6 +114,7 @@ int Negamax::Negamax(Board board, int alpha, int beta, TranspositionTable* trans
 		return transpositionTable->get(board);
 	}
 	*/
+
 	if (depth == 0 || board.isTerminal())
 	{
 		int value = Negamax::Evaluate(board);
@@ -97,6 +122,21 @@ int Negamax::Negamax(Board board, int alpha, int beta, TranspositionTable* trans
 	}
 	else
 	{
+		for (int i = 0; i < 7; i++)
+		{
+			if (board.isValidMove(i) && board.moveIsWinning(i))
+			{
+				if (board.getMoveNumber() % 2 == 0)
+				{
+					return -43 + board.getMoveNumber();
+				}
+				else
+				{
+					return 43 - board.getMoveNumber();
+				}
+			}
+		}
+
 		int value = -1000;
 		for (int i = 0; i < 7; i++)
 		{

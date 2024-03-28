@@ -48,12 +48,6 @@ public:
 	bool draw();
 
 	/// <summary>
-	/// Check if the board is full
-	/// </summary>
-	/// <returns>True if the board is full, false otherwise</returns>
-	bool isFull();
-
-	/// <summary>
 	/// Check if a move is valid
 	/// </summary>
 	/// <param name="column">Column to check</param>
@@ -138,5 +132,7 @@ public:
 	/// <param name="board">Bitboard to check</param>
 	/// <returns>True if 4 pieces are aligned, false otherwise</returns>
 	bool checkWinFast(unsigned __int64 board);
+
+	bool moveIsWinning(int column);
 };
 

@@ -14,7 +14,6 @@ namespace Puissance4AppTests
 		{
 			Board board;
 			Assert::IsTrue(board.isEmpty());
-			Assert::IsFalse(board.isFull());
 			Assert::IsFalse(board.isTerminal());
 		}
 
@@ -25,7 +24,6 @@ namespace Puissance4AppTests
 			Board newBoard = board.copy();
 			Assert::AreEqual(board.getMoveNumber(), newBoard.getMoveNumber());
 			Assert::AreEqual(board.isEmpty(), newBoard.isEmpty());
-			Assert::AreEqual(board.isFull(), newBoard.isFull());
 			Assert::AreEqual(board.isTerminal(), newBoard.isTerminal());
 			Assert::AreEqual(board.playerWins(), newBoard.playerWins());
 			Assert::AreEqual(board.robotWins(), newBoard.robotWins());
@@ -52,7 +50,6 @@ namespace Puissance4AppTests
 			Board board;
 			board.Play(0);
 			Assert::IsFalse(board.isEmpty());
-			Assert::IsFalse(board.isFull());
 			Assert::IsFalse(board.isTerminal());
 		}
 

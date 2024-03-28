@@ -22,6 +22,7 @@ int main()
 	bool isConnected = robot.connect();
 	while (!isConnected)
 	{
+		std::this_thread::sleep_for(std::chrono::seconds(1));
 		isConnected = robot.connect();
 	}
 	robot.Home();
@@ -59,5 +60,4 @@ int main()
 	}
 	uiController.stop(stateMachine.getState());
 	return 0;
-	
 }
