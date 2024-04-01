@@ -141,6 +141,39 @@ unsigned __int64 Board::getRobotBitboard()
 	return robotBoard;
 }
 
+bool Board::isValid()
+{
+	// Check if all pieces have another piece below
+	for (int column = 0; column < 7; column++)
+	{
+		for (int row = 0; row < 6; row++)
+		{
+			if (!getPiece(column, row, playerBoard) && !getPiece(column, row, robotBoard))
+			{
+				if (getPiece(column, row + 1, playerBoard) || getPiece(column, row + 1, robotBoard))
+				{
+					return false;
+				}
+			}
+		}
+	}
+
+	return true;
+}
+
+int Board::getPiece(int column, int row)
+{
+	if (getPiece(column, row, playerBoard))
+	{
+		return 1;
+	}
+	if (getPiece(column, row, robotBoard))
+	{
+		return 2;
+	}
+	return 0;
+}
+
 bool Board::getPiece(int column, int row, unsigned __int64 board)
 {
 	unsigned __int64 mask = 1;

@@ -16,6 +16,8 @@ public:
 
 	static Board detectBoard(cv::Mat image, Color playerColor);
 
+	static void detectBoard(cv::Mat image, Color playerColor, Board* board);
+
 private:
 
 	/// <summary>
@@ -80,4 +82,8 @@ private:
 	/// <param name="color">RGB color</param>
 	/// <returns>Color enum element</returns>
 	static Color getColor(cv::Vec3b color);
+
+	static std::vector<cv::Vec3f> workingCircles;
+
+	static std::vector<cv::Vec3f> addAndRemoveDuplicates(std::vector<cv::Vec3f> newCircles, std::vector<cv::Vec3f> previousCircles);
 };

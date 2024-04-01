@@ -33,7 +33,7 @@ void Camera::getWebcamImage(cv::Mat* frame)
 	if (frame == nullptr)
 		return;
 
-	cv::VideoCapture cap(1);
+	cv::VideoCapture cap(0);
 	if (!cap.isOpened())
 		return;
 

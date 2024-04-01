@@ -1,5 +1,7 @@
 #include "Negamax.hpp"
 
+int columnOrder[7] = { 3, 2, 4, 1, 5, 0, 6 };
+
 int Negamax::GetBestMove(Board board, TranspositionTable* transpositionTable, unsigned int depth)
 {
 	//One thread for each column
@@ -53,7 +55,11 @@ int Negamax::GetBestMove(Board board, TranspositionTable* transpositionTable, un
 	//Find the best move with the highest value
 	for (int i = 0; i < 7; i++)
 	{
-		if (results[i] > bestValue)
+		if (results[i] == bestValue)
+		{
+			bestMove = Negamax::compareColumnOrder(i, bestMove);
+		}
+		else if (results[i] > bestValue)
 		{
 			bestValue = results[i];
 			bestMove = i;
@@ -165,4 +171,29 @@ int Negamax::Negamax(Board board, int alpha, int beta, TranspositionTable* trans
 void Negamax::NegamaxThread(Board board, int* result, TranspositionTable* transpositionTable, unsigned int depth)
 {
 	*result = Negamax::Negamax(board, -100000, 100000, transpositionTable, depth);
+}
+
+int Negamax::compareColumnOrder(int a, int b)
+{
+	int aIndex = -1;
+	int bIndex = -1;
+	for (int i = 0; i < 7; i++)
+	{
+		if (columnOrder[i] == a)
+		{
+			aIndex = i;
+		}
+		if (columnOrder[i] == b)
+		{
+			bIndex = i;
+		}
+	}
+	if (aIndex < bIndex)
+	{
+		return columnOrder[aIndex];
+	}
+	else
+	{
+		return columnOrder[bIndex];
+	}
 }

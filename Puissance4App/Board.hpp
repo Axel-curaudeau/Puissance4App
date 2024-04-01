@@ -93,6 +93,18 @@ public:
 	/// <returns>The robot bitboard</returns>
 	unsigned __int64 getRobotBitboard();
 
+	/// <summary>
+	/// Check if the board is valid
+	/// </summary>
+	/// <returns>True if every piece has another piece below, false otherwise</returns>
+	bool isValid();
+
+	/// <summary>
+	/// Get the piece at the given position
+	/// </summary>
+	/// <returns>1 if the player has a piece, 2 if the robot has a piece, 0 otherwise</returns>
+	int getPiece(int column, int row);
+
 private:
 	unsigned __int64 playerBoard;
 	unsigned __int64 robotBoard;

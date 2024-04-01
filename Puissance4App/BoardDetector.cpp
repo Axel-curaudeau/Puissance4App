@@ -1,5 +1,7 @@
 #include "BoardDetector.hpp"
 
+std::vector<cv::Vec3f> BoardDetector::workingCircles;
+
 Board BoardDetector::detectBoard(cv::Mat image, Color playerColor)
 {
 	//Detect the circles in the image
@@ -28,7 +30,6 @@ Board BoardDetector::detectBoard(cv::Mat image, Color playerColor)
 	if (boardCircles.size() == 0)
 	{
 		std::cout << "No board circles detected" << std::endl;
-		return Board();
 	}
 
 	//Sort the circles in the correct order
@@ -36,13 +37,22 @@ Board BoardDetector::detectBoard(cv::Mat image, Color playerColor)
 	if (sortedCircles.size() == 0)
 	{
 		std::cout << "No sorted circles detected" << std::endl;
-		return Board();
 	}
 
 	//Detect the colors of the circles
 	Board board = detectColors(image, sortedCircles);
 
 	return board;
+}
+
+void BoardDetector::detectBoard(cv::Mat image, Color playerColor, Board* board)
+{
+	//Create a new thread launching detectBoard
+	std::thread detectBoardThread([image, playerColor, board]()
+		{
+			*board = detectBoard(image, playerColor);
+		});
+	detectBoardThread.detach();
 }
 
 std::vector<cv::Vec3f> BoardDetector::detectCircle(cv::Mat frame)
@@ -103,7 +113,7 @@ std::vector<cv::Vec3f> BoardDetector::filterCircles(cv::Mat image, std::vector<c
 	uint i = 0;
 	while(i < circles.size())
 	{
-		if (circles[i][1] >= firstCircle[1] - 10 && circles[i][1] <= firstCircle[1] + 10 && circles[i][2] >= firstCircle[2] - 5 && circles[i][2] <= firstCircle[2] + 5)
+		if (circles[i][1] >= firstCircle[1] - 10 && circles[i][1] <= firstCircle[1] + 10) //&& circles[i][2] >= firstCircle[2] - 5 && circles[i][2] <= firstCircle[2] + 5)
 		{
 			boardCircles.push_back(circles[i]);
 			circles.erase(circles.begin() + i);
@@ -197,7 +207,18 @@ Board BoardDetector::detectColors(cv::Mat image, std::vector<cv::Vec3f> boardCir
 {
 	if (boardCircles.size() != 42)
 	{
-		return Board();
+		if (workingCircles.size() == 42)
+		{
+			boardCircles = workingCircles;
+		}
+		else
+		{
+			return Board();
+		}
+	}
+	else
+	{
+		workingCircles = boardCircles;
 	}
 
 	Board board;
@@ -256,4 +277,27 @@ BoardDetector::Color BoardDetector::getColor(cv::Vec3b color)
 		return Color::RED;
 	}
 	return Color::YELLOW;
+}
+
+std::vector<cv::Vec3f> BoardDetector::addAndRemoveDuplicates(std::vector<cv::Vec3f> newCircles, std::vector<cv::Vec3f> oldCircles)
+{
+	std::vector<cv::Vec3f> result = newCircles;
+
+	for (int i = 0; i < oldCircles.size(); i++)
+	{
+		result.push_back(oldCircles[i]);
+	}
+
+	for (int i = 0; i < result.size(); i++)
+	{
+		for (int j = i + 1; j < result.size(); j++)
+		{
+			if (abs(result[i][0] - result[j][0]) < 10 && abs(result[i][1] - result[j][1]) < 10)
+			{
+				result.erase(result.begin() + j);
+			}
+		}
+	}
+
+	return result;
 }

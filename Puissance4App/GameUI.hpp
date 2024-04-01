@@ -6,6 +6,7 @@
 #include "Button.hpp"
 #include "StateMachine.hpp"
 #include "Camera.hpp"
+#include "Board.hpp"
 
 static std::atomic<bool> webcamThreadRunning = true;
 
@@ -46,14 +47,25 @@ public:
 	/// <param name="event">The event to handle.</param>
 	StateMachine::State handleEvent(sf::Event event);
 
+	void updateBoard(sf::RenderWindow& window, Board board);
+
 private:
 	Button backButton;
 
 	std::thread* webcamThread = nullptr;
 
-	sf::RectangleShape gameGrid;
+	
 	sf::Image* webcamImage;
 	sf::Texture* webcamTexture;
 	sf::Sprite* webcamSprite;
+
+	//grille de jeu
+	sf::RectangleShape gameGrid;
+
+	//cercles de la couleur des pièces dans la grille de jeu
+	std::vector<sf::CircleShape> circlesPieces;
+
+	//texte de chargement
+	sf::Text loadingText;
 };
 

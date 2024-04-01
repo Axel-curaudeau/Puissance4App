@@ -18,17 +18,20 @@ int main()
 	TranspositionTable* transpositionTable = new TranspositionTable();
 	Robot robot;
 	int moveNumber = 0;
-
-	bool isConnected = robot.connect();
-	while (!isConnected)
-	{
-		std::this_thread::sleep_for(std::chrono::seconds(1));
-		isConnected = robot.connect();
-	}
-	robot.Home();
+	bool isConnected = false;
 	
 	while (uiController.getWindow().isOpen())
 	{
+		if (!isConnected)
+		{
+			//TODO: à tester
+			isConnected = robot.connect();
+			if (isConnected)
+			{
+				robot.Home();
+			}
+		}
+
 		StateMachine::State newState = uiController.tick(stateMachine.getState());
 		if (newState != stateMachine.getState()) {
 			stateMachine.ChangeState(newState);
@@ -43,20 +46,40 @@ int main()
 			continue;
 		}
 
+		//TODO: à tester
+		Board* board = new Board();
+		BoardDetector::detectBoard(frame, BoardDetector::Color::RED, board);
+		if (!board->isEmpty() && board->isValid())
+		{
+			board->printBoard();
+			uiController.getGameUI()->updateBoard(uiController.getWindow(), *board);
+
+			if (board->getMoveNumber() == moveNumber + 1 && board->getMoveNumber() % 2 == 1)
+			{
+				moveNumber += 2;
+				int bestMove = Negamax::GetBestMove(*board, transpositionTable, 7);
+				board->Play(bestMove);
+				board->printBoard();
+				robot.Play(bestMove);
+			}
+		}
+		/*
 		Board board = BoardDetector::detectBoard(frame, BoardDetector::Color::RED);
 		uiController.getGameUI()->getCameraFrame(frame);
-		if (!board.isEmpty())
+		if (!board.isEmpty() && board.isValid())
 		{
 			board.printBoard();
+			uiController.getGameUI()->updateBoard(uiController.getWindow(), board);
+
 			if (board.getMoveNumber() == moveNumber + 1 && board.getMoveNumber() % 2 == 1)
 			{
 				moveNumber += 2;
-				int bestMove = Negamax::GetBestMove(board, transpositionTable, 8);
+				int bestMove = Negamax::GetBestMove(board, transpositionTable, 7);
 				board.Play(bestMove);
 				board.printBoard();
 				robot.Play(bestMove);
 			}
-		}
+		}*/
 	}
 	uiController.stop(stateMachine.getState());
 	return 0;

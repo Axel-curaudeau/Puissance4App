@@ -45,4 +45,6 @@ namespace Negamax
 	/// <param name="transpositionTable"></param>
 	/// <param name="depth"></param>
 	void NegamaxThread(Board board, int* result, TranspositionTable* transpositionTable, unsigned int depth);
+
+	int compareColumnOrder(int a, int b);
 }
