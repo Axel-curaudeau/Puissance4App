@@ -44,12 +44,11 @@ bool Robot::connect()
 		switch (connectDobotResult) {
 		case DobotConnect_NotFound:
 			std::cerr << "Dobot not found";
-			break;
+			return false;
 		case DobotConnect_Occupied:
 			std::cerr << "Dobot port occupied";
-			break;
+			return false;
 		}
-		return 1;
 	}
 
 	std::cout << "Connected to dobot" << std::endl;
@@ -110,6 +109,17 @@ void Robot::Play(int column)
 	else {
 		goTo(pieceCoordinates[0], 90);
 	}
+}
+
+void Robot::Refill()
+{
+	std::cout << "Refilling pieces" << std::endl;
+	remainingPieces = 8;
+}
+
+int Robot::getRemainingPieces()
+{
+	return remainingPieces;
 }
 
 void Robot::goTo(Pose position)

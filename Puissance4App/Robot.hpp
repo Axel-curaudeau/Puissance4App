@@ -31,6 +31,10 @@ public:
 	/// <param name="column">Column number (0-6)</param>
 	void Play(int column);
 
+	void Refill();
+
+	int getRemainingPieces();
+
 private:
 
 	int dobotId = -1;

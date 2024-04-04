@@ -45,16 +45,6 @@ Board BoardDetector::detectBoard(cv::Mat image, Color playerColor)
 	return board;
 }
 
-void BoardDetector::detectBoard(cv::Mat image, Color playerColor, Board* board)
-{
-	//Create a new thread launching detectBoard
-	std::thread detectBoardThread([image, playerColor, board]()
-		{
-			*board = detectBoard(image, playerColor);
-		});
-	detectBoardThread.detach();
-}
-
 std::vector<cv::Vec3f> BoardDetector::detectCircle(cv::Mat frame)
 {
 	if (frame.empty())

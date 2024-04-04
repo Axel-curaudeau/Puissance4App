@@ -10,7 +10,7 @@
 /// </summary>
 class uiController {
 public:
-	uiController(sf::Vector2u windowSize);
+	uiController(sf::Vector2u windowSize, Robot* robot);
 	StateMachine::State tick(StateMachine::State actualState);
 	sf::RenderWindow& getWindow();
 	sf::Font* font;

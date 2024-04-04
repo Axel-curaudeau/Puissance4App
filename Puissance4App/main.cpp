@@ -12,23 +12,26 @@ using namespace std;
 int main()
 {
 	sf::Vector2u windowSize(1280, 720);
-	uiController uiController(windowSize);
+	Robot* robot = new Robot();
+	uiController uiController(windowSize, robot);
 	StateMachine stateMachine;
 	Camera* camera = new Camera();
 	TranspositionTable* transpositionTable = new TranspositionTable();
-	Robot robot;
-	int moveNumber = 0;
+	int moveNumber = -1;
 	bool isConnected = false;
 	
 	while (uiController.getWindow().isOpen())
 	{
 		if (!isConnected)
 		{
-			//TODO: à tester
-			isConnected = robot.connect();
+			isConnected = robot->connect();
 			if (isConnected)
 			{
-				robot.Home();
+				robot->Home();
+			}
+			else
+			{
+				continue;
 			}
 		}
 
@@ -46,28 +49,47 @@ int main()
 			continue;
 		}
 
-		//TODO: à tester
-		Board* board = new Board();
-		BoardDetector::detectBoard(frame, BoardDetector::Color::RED, board);
-		if (!board->isEmpty() && board->isValid())
-		{
-			board->printBoard();
-			uiController.getGameUI()->updateBoard(uiController.getWindow(), *board);
+		
 
-			if (board->getMoveNumber() == moveNumber + 1 && board->getMoveNumber() % 2 == 1)
-			{
-				moveNumber += 2;
-				int bestMove = Negamax::GetBestMove(*board, transpositionTable, 7);
-				board->Play(bestMove);
-				board->printBoard();
-				robot.Play(bestMove);
-			}
+		if (uiController.getGameUI()->restart)
+		{
+			moveNumber = -1;
+			uiController.getGameUI()->restart = false;
+			Board emptyBoard;
+			uiController.getGameUI()->updateBoard(uiController.getWindow(), emptyBoard);
 		}
-		/*
+
 		Board board = BoardDetector::detectBoard(frame, BoardDetector::Color::RED);
 		uiController.getGameUI()->getCameraFrame(frame);
+		
 		if (!board.isEmpty() && board.isValid())
 		{
+			if (board.playerWins())
+			{
+				uiController.getGameUI()->updateBoard(uiController.getWindow(), board);
+				uiController.getGameUI()->playerVictory(uiController.getWindow());
+				moveNumber = -1;
+				continue;
+			}
+			else if (board.robotWins())
+			{
+				uiController.getGameUI()->updateBoard(uiController.getWindow(), board);
+				uiController.getGameUI()->playerDefeat(uiController.getWindow());
+				moveNumber = -1;
+				continue;
+			}
+			if (moveNumber == -1)
+			{
+				if (board.getMoveNumber() % 2 == 1)
+				{
+					moveNumber = board.getMoveNumber() - 1;
+				}
+				else
+				{
+					moveNumber = board.getMoveNumber();
+				}
+			}
+
 			board.printBoard();
 			uiController.getGameUI()->updateBoard(uiController.getWindow(), board);
 
@@ -77,9 +99,10 @@ int main()
 				int bestMove = Negamax::GetBestMove(board, transpositionTable, 7);
 				board.Play(bestMove);
 				board.printBoard();
-				robot.Play(bestMove);
+				robot->Play(bestMove);
 			}
-		}*/
+		}
+		
 	}
 	uiController.stop(stateMachine.getState());
 	return 0;

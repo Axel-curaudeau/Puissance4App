@@ -1,6 +1,6 @@
 #include "Negamax.hpp"
 
-int columnOrder[7] = { 3, 2, 4, 1, 5, 0, 6 };
+int columnOrder[7] = { 2, 3, 4, 1, 5, 0, 6 };
 
 int Negamax::GetBestMove(Board board, TranspositionTable* transpositionTable, unsigned int depth)
 {
@@ -104,7 +104,6 @@ int Negamax::Evaluate(Board terminalBoard)
 	else
 	{
 		return 0;
-		//return (terminalBoard.getMoveNumber() % 2) * -1 * -43;
 	}
 }
 

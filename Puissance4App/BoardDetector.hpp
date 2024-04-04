@@ -16,8 +16,6 @@ public:
 
 	static Board detectBoard(cv::Mat image, Color playerColor);
 
-	static void detectBoard(cv::Mat image, Color playerColor, Board* board);
-
 private:
 
 	/// <summary>

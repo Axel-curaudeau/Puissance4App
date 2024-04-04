@@ -158,6 +158,28 @@ bool Board::isValid()
 		}
 	}
 
+	// Check if the number of pieces is valid
+	int playerPieces = 0;
+	int robotPieces = 0;
+	for (int column = 0; column < 7; column++)
+	{
+		for (int row = 0; row < 6; row++)
+		{
+			if (getPiece(column, row, playerBoard))
+			{
+				playerPieces++;
+			}
+			if (getPiece(column, row, robotBoard))
+			{
+				robotPieces++;
+			}
+		}
+	}
+	if (playerPieces < robotPieces || playerPieces > robotPieces + 1)
+	{
+		return false;
+	}
+
 	return true;
 }
 

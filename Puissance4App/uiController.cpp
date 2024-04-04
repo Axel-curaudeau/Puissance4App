@@ -1,7 +1,7 @@
 #include "uiController.hpp"
 
 
-uiController::uiController(sf::Vector2u windowSize)
+uiController::uiController(sf::Vector2u windowSize, Robot* robot)
 {	
 	window.create(sf::VideoMode(windowSize.x, windowSize.y), "Puissance 4 avec le robot !");
 	window.setFramerateLimit(60);
@@ -11,7 +11,7 @@ uiController::uiController(sf::Vector2u windowSize)
 		std::cerr << "Add the font file here :" << fontPath << std::endl;
 	}
 	mainMenu = new MainMenu(font);
-	gameUI = new GameUI(font);
+	gameUI = new GameUI(font, robot);
 }
 
 StateMachine::State uiController::tick(StateMachine::State actualState)

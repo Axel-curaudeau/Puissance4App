@@ -7,6 +7,7 @@
 #include "StateMachine.hpp"
 #include "Camera.hpp"
 #include "Board.hpp"
+#include "Robot.hpp"
 
 static std::atomic<bool> webcamThreadRunning = true;
 
@@ -27,7 +28,7 @@ public:
 	/// Initialize the game UI with the given font.
 	/// </summary>
 	/// <param name="font">The font to use for the texts.</param>
-	GameUI(sf::Font* font);
+	GameUI(sf::Font* font, Robot* robot);
 
 	/// <summary>
 	/// Draw the game UI and all his components on the given window.
@@ -48,6 +49,10 @@ public:
 	StateMachine::State handleEvent(sf::Event event);
 
 	void updateBoard(sf::RenderWindow& window, Board board);
+	void playerVictory(sf::RenderWindow& window);
+	void playerDefeat(sf::RenderWindow& window);
+
+	bool restart = false;
 
 private:
 	Button backButton;
@@ -67,5 +72,18 @@ private:
 
 	//texte de chargement
 	sf::Text loadingText;
+
+	//texte de victoire
+	sf::Text victoryText;
+	bool victoryVisible = false;
+
+	Button restartButton;
+	Button refillButton;
+
+	sf::RectangleShape left_available_pieces;
+	sf::RectangleShape right_available_pieces;
+	std::vector<sf::CircleShape> availablePieces;
+
+	Robot* robot;
 };
 
