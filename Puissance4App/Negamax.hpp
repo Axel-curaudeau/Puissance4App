@@ -47,4 +47,6 @@ namespace Negamax
 	void NegamaxThread(Board board, int* result, TranspositionTable* transpositionTable, unsigned int depth);
 
 	int compareColumnOrder(int a, int b);
+
+	int GetBestMoveEarlyGame(Board board);
 }

@@ -4,6 +4,12 @@ int columnOrder[7] = { 2, 3, 4, 1, 5, 0, 6 };
 
 int Negamax::GetBestMove(Board board, TranspositionTable* transpositionTable, unsigned int depth)
 {
+	//Avoid instant loose
+	if (board.getMoveNumber() == 1)
+	{
+		return Negamax::GetBestMoveEarlyGame(board);
+	}
+
 	//One thread for each column
 	std::thread columnThreads[7];
 
@@ -194,5 +200,17 @@ int Negamax::compareColumnOrder(int a, int b)
 	else
 	{
 		return columnOrder[bIndex];
+	}
+}
+
+int Negamax::GetBestMoveEarlyGame(Board board)
+{
+	if (board.getPiece(3, 0) == 1)
+	{
+		return 2;
+	}
+	else
+	{
+		return 3;
 	}
 }
