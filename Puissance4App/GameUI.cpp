@@ -35,6 +35,7 @@ GameUI::GameUI(sf::Font* font, Robot* robot)
 	webcamImage = new sf::Image();
 	webcamTexture = new sf::Texture();
 	webcamSprite = new sf::Sprite();
+	webcamSprite->setScale(0.7, 0.7);
 
 	for (int i = 0; i < 42; i++)
 	{

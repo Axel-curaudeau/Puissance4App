@@ -220,7 +220,7 @@ Board BoardDetector::detectColors(cv::Mat image, std::vector<cv::Vec3f> boardCir
 		cv::Vec3b pieceColor = getCircleMeanColor(image, boardCircles[i]);
 
 		//Draw the circle with the detected color for debug
-		cv::circle(image, cv::Point(boardCircles[i][0], boardCircles[i][1]), boardCircles[i][2] - 5, cv::Scalar(pieceColor[0], pieceColor[1], pieceColor[2]), -1);
+		cv::circle(image, cv::Point(boardCircles[i][0], boardCircles[i][1]), boardCircles[i][2] - 10, cv::Scalar(pieceColor[0], pieceColor[1], pieceColor[2]), -1);
 
 		//Detect the color of the circle
 		Color color = getColor(pieceColor);
@@ -249,7 +249,7 @@ cv::Vec3b BoardDetector::getCircleMeanColor(cv::Mat image, cv::Vec3f circle)
 {
 	//Create a mask to get only the circle pixels
 	cv::Mat mask = cv::Mat::zeros(image.size(), CV_8UC1);
-	cv::circle(mask, cv::Point(circle[0], circle[1]), circle[2] - 5, cv::Scalar(255), -1);	
+	cv::circle(mask, cv::Point(circle[0], circle[1]), circle[2] - 10, cv::Scalar(255), -1);	
 
 	//Get the mean color of the circle
 	cv::Scalar mean = cv::mean(image, mask);

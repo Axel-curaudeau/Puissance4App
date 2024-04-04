@@ -96,7 +96,7 @@ int main()
 			if (board.getMoveNumber() == moveNumber + 1 && board.getMoveNumber() % 2 == 1)
 			{
 				moveNumber += 2;
-				int bestMove = Negamax::GetBestMove(board, transpositionTable, 7);
+				int bestMove = Negamax::GetBestMove(board, transpositionTable, 8);
 				board.Play(bestMove);
 				board.printBoard();
 				robot->Play(bestMove);
